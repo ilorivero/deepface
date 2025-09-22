@@ -1,0 +1,44 @@
+# ==============================================================================
+# DEPENDÊNCIAS DO PROJETO - SISTEMA DE RECONHECIMENTO FACIAL
+# ==============================================================================
+# Este arquivo contém todas as bibliotecas Python necessárias para executar
+# o sistema de reconhecimento facial com DeepFace.
+#
+# Para instalar: pip install -r requirements.txt
+# ==============================================================================
+
+# Core Libraries - Essenciais para o funcionamento
+deepface>=0.0.79                # Framework de análise facial com modelos pré-treinados
+opencv-python>=4.5.0            # Computer vision e processamento de imagem
+flask>=2.0.0                    # Framework web para interface HTTP
+numpy>=1.19.0                   # Computação numérica e manipulação de arrays
+
+# Deep Learning Framework
+tensorflow>=2.4.0               # Framework de deep learning (backend do DeepFace)
+
+# Bibliotecas de Suporte
+Pillow>=8.0.0                   # Processamento de imagens PIL
+matplotlib>=3.3.0               # Visualização (usado internamente pelo DeepFace)
+pandas>=1.1.0                   # Manipulação de dados (usado pelo DeepFace)
+
+# Bibliotecas de Visão Computacional Adicionais
+scikit-learn>=0.24.0            # Machine learning (usado para classificações)
+scipy>=1.6.0                    # Computação científica
+
+# Utilitários
+requests>=2.25.0                # Requisições HTTP (download de modelos)
+tqdm>=4.60.0                    # Barras de progresso
+gdown>=3.12.0                   # Download de modelos do Google Drive
+
+# Bibliotecas Opcionais para Performance
+# Descomente as linhas abaixo se você tiver GPU NVIDIA disponível:
+# tensorflow-gpu>=2.4.0         # Versão GPU do TensorFlow (mais rápida)
+# cupy-cuda11x                   # Aceleração GPU para NumPy
+
+# Bibliotecas para Desenvolvimento (Opcional)
+# Descomente se você for desenvolver/modificar o código:
+# jupyter>=1.0.0                # Notebooks para experimentação
+# ipykernel>=5.5.0              # Kernel Jupyter
+# black>=21.0.0                 # Formatação de código
+# flake8>=3.8.0                 # Linting de código
+# pytest>=6.0.0                 # Testes unitários

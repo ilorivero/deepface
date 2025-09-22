@@ -1,0 +1,149 @@
+# ==============================================================================
+# GITIGNORE - SISTEMA DE RECONHECIMENTO FACIAL
+# ==============================================================================
+# Este arquivo especifica quais arquivos e pastas devem ser ignorados pelo Git
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ==============================================================================
+# ARQUIVOS ESPECÍFICOS DO PROJETO
+# ==============================================================================
+
+# Modelos de Deep Learning baixados automaticamente
+.deepface/
+weights/
+models/
+
+# Logs da aplicação
+logs/
+*.log
+
+# Arquivos temporários de imagem/vídeo
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Configurações locais
+config.local.py
+.env
+.env.local
+
+# Dados sensíveis
+secrets/
+credentials/
+keys/
+
+# Backup files
+*.bak
+*.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+desktop.ini
+
+# Arquivos de sessão Flask
+flask_session/
+
+# Arquivos de cache do TensorFlow
+.tf_cache/
