@@ -1,6 +1,6 @@
 # 🔍 Sistema de Reconhecimento Facial em Tempo Real
 
-Um sistema completo de análise facial que utiliza **DeepFace** e **OpenCV** para detectar e analisar características faciais em tempo real através de uma interface web moderna.
+Um sistema completo de análise facial que utiliza **DeepFace** e **OpenCV** para detectar e analisar características faciais em tempo real através de uma interface web moderna. Este exemplo de código foi gerado pelo Copilot e documentado pelo Claude para testar as capacidades de desenvolvimento de aplicações simples que utilizem Inteligência Artificial.
 
 ![Python](https://img.shields.io/badge/python-v3.7+-blue.svg)
 ![OpenCV](https://img.shields.io/badge/opencv-v4.0+-green.svg)
@@ -299,7 +299,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ```
 MIT License
 
-Copyright (c) 2025 [Seu Nome]
+Copyright (c) 2025 Ilo Rivero
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -322,10 +322,10 @@ SOFTWARE.
 
 ## 📞 Contato
 
-- **Autor**: [Seu Nome]
-- **Email**: [seu.email@exemplo.com]
-- **LinkedIn**: [seu-linkedin]
-- **GitHub**: [seu-github]
+- **Autor**: Ilo Rivero
+- **Email**: ilo@pucminas.br
+- **LinkedIn**: https://linkedin.com/in/ilorivero
+- **GitHub**: github.com/ilorivero
 
 ---
 
