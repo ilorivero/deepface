@@ -8,16 +8,6 @@ from deepface_app.constants import DEFAULT_APP_PORT
 from deepface_app.server.network import discover_lan_ips
 
 
-def _disabled_attributes():
-    return {
-        "age": "--",
-        "gender": "--",
-        "emotion": "--",
-        "ethnicity": "--",
-        "emotion_details": [],
-    }
-
-
 def create_main_blueprint(face_analyzer, camera_service, state):
     main_blueprint = Blueprint("main", __name__)
 
@@ -46,44 +36,6 @@ def create_main_blueprint(face_analyzer, camera_service, state):
             return jsonify(disabled_state)
 
         return jsonify(state["latest_attributes"])
-
-    @main_blueprint.route("/camera_status")
-    def camera_status():
-        return jsonify(
-            {
-                "enabled": camera_service.is_camera_enabled(),
-                "available": camera_service.camera_available,
-            }
-        )
-
-    @main_blueprint.route("/camera/control", methods=["POST"])
-    def camera_control():
-        payload = request.get_json(silent=True) or {}
-        target_enabled = payload.get("enabled")
-
-        if not isinstance(target_enabled, bool):
-            return jsonify({"error": "Parâmetro 'enabled' inválido."}), 400
-
-        if target_enabled:
-            available = camera_service.start_camera()
-            message = (
-                "Câmera ligada."
-                if available
-                else "Câmera ligada, mas nenhum dispositivo foi encontrado."
-            )
-        else:
-            camera_service.stop_camera()
-            available = False
-            message = "Câmera desligada."
-            state["latest_attributes"] = _disabled_attributes()
-
-        return jsonify(
-            {
-                "enabled": camera_service.is_camera_enabled(),
-                "available": available,
-                "message": message,
-            }
-        )
 
     @main_blueprint.route("/server_info")
     def server_info():
