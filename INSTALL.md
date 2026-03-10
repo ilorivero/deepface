@@ -14,19 +14,22 @@ Este documento fornece instruções passo-a-passo para instalar e configurar o S
 ## 💻 Pré-requisitos por Sistema
 
 ### Windows 10/11
+
 - Python 3.7+ ([Download oficial](https://python.org/downloads/))
 - Microsoft Visual C++ Redistributable
 - Webcam funcional
 - Mínimo 4GB RAM
 
 ### macOS 10.14+
+
 - Python 3.7+ (via Homebrew recomendado)
 - Xcode Command Line Tools
 - Webcam funcional
 - Mínimo 4GB RAM
 
 ### Ubuntu/Debian/Linux
-- Python 3.7+ 
+
+- Python 3.7+
 - Pacotes de desenvolvimento
 - Webcam funcional
 - Mínimo 4GB RAM
@@ -34,6 +37,7 @@ Este documento fornece instruções passo-a-passo para instalar e configurar o S
 ## 🪟 Instalação no Windows
 
 ### Passo 1: Instalar Python
+
 ```powershell
 # Baixar e instalar Python do site oficial
 # https://python.org/downloads/
@@ -44,24 +48,28 @@ pip --version
 ```
 
 ### Passo 2: Instalar Visual C++ Redistributable
+
 ```powershell
 # Baixar do site oficial da Microsoft
 # https://aka.ms/vs/17/release/vc_redist.x64.exe
 ```
 
 ### Passo 3: Clonar o Repositório
+
 ```powershell
 git clone https://github.com/seu-usuario/reconhecimento-facial.git
 cd reconhecimento-facial
 ```
 
 ### Passo 4: Criar Ambiente Virtual
+
 ```powershell
 python -m venv venv
 venv\Scripts\activate
 ```
 
 ### Passo 5: Instalar Dependências
+
 ```powershell
 # Atualizar pip
 python -m pip install --upgrade pip
@@ -71,23 +79,27 @@ pip install -r requirements.txt
 ```
 
 ### Passo 6: Teste de Funcionamento
+
 ```powershell
-python reconhecimento.py
+python main.py
 ```
 
 ## 🍎 Instalação no macOS
 
 ### Passo 1: Instalar Homebrew (se não tiver)
+
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
 ### Passo 2: Instalar Python
+
 ```bash
 brew install python@3.9
 ```
 
 ### Passo 3: Instalar Dependências do Sistema
+
 ```bash
 # Para OpenCV
 brew install cmake pkg-config
@@ -96,24 +108,28 @@ brew install eigen tbb
 ```
 
 ### Passo 4: Clonar o Repositório
+
 ```bash
 git clone https://github.com/seu-usuario/reconhecimento-facial.git
 cd reconhecimento-facial
 ```
 
 ### Passo 5: Criar Ambiente Virtual
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 ### Passo 6: Instalar Dependências
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 ### Passo 7: Permissões da Webcam
+
 ```bash
 # O macOS solicitará permissão para acessar a câmera
 # Aceite quando solicitado ou vá em:
@@ -125,11 +141,13 @@ pip install -r requirements.txt
 ### Ubuntu/Debian
 
 ### Passo 1: Atualizar Sistema
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
 ### Passo 2: Instalar Python e Dependências
+
 ```bash
 sudo apt install python3 python3-pip python3-venv python3-dev
 sudo apt install build-essential cmake pkg-config
@@ -141,24 +159,28 @@ sudo apt install libatlas-base-dev gfortran
 ```
 
 ### Passo 3: Clonar o Repositório
+
 ```bash
 git clone https://github.com/seu-usuario/reconhecimento-facial.git
 cd reconhecimento-facial
 ```
 
 ### Passo 4: Criar Ambiente Virtual
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 ### Passo 5: Instalar Dependências
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 ### Passo 6: Configurar Webcam
+
 ```bash
 # Verificar se a webcam está detectada
 lsusb | grep -i camera
@@ -171,6 +193,7 @@ sudo apt install cheese guvcview
 ### CentOS/RHEL/Fedora
 
 ### Passo 1: Instalar Dependências
+
 ```bash
 # Fedora
 sudo dnf install python3 python3-pip python3-devel
@@ -188,6 +211,7 @@ sudo yum install cmake gcc gcc-c++ make
 ## ✅ Verificação da Instalação
 
 ### Teste 1: Importações Básicas
+
 ```python
 python -c "
 import cv2
@@ -201,6 +225,7 @@ print(f'NumPy versão: {np.__version__}')
 ```
 
 ### Teste 2: Webcam
+
 ```python
 python -c "
 import cv2
@@ -214,6 +239,7 @@ else:
 ```
 
 ### Teste 3: DeepFace
+
 ```python
 python -c "
 from deepface import DeepFace
@@ -231,14 +257,18 @@ except Exception as e:
 ## 🔧 Solução de Problemas
 
 ### Problema 1: "Microsoft Visual C++ 14.0 is required"
+
 **Windows:**
+
 ```powershell
 # Instalar Build Tools para Visual Studio
 # https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019
 ```
 
 ### Problema 2: "Could not find a backend to open camera"
+
 **Todos os sistemas:**
+
 ```bash
 # Verificar se a webcam não está sendo usada por outro programa
 # Reiniciar o computador se necessário
@@ -246,12 +276,14 @@ except Exception as e:
 ```
 
 ### Problema 3: "No module named 'cv2'"
+
 ```bash
 pip uninstall opencv-python opencv-contrib-python
 pip install opencv-python
 ```
 
 ### Problema 4: Erro de memória/TensorFlow
+
 ```bash
 # Para CPU apenas (mais leve)
 pip uninstall tensorflow
@@ -262,6 +294,7 @@ export TF_CPP_MIN_LOG_LEVEL=2
 ```
 
 ### Problema 5: "Permission denied" para webcam (Linux)
+
 ```bash
 # Adicionar usuário ao grupo video
 sudo usermod -a -G video $USER
@@ -269,8 +302,9 @@ sudo usermod -a -G video $USER
 ```
 
 ### Problema 6: Porta 5000 ocupada
+
 ```python
-# Alterar porta no arquivo reconhecimento.py
+# Alterar porta no arquivo main.py
 app.run(debug=True, port=5001)  # ou qualquer porta livre
 ```
 
@@ -279,11 +313,13 @@ app.run(debug=True, port=5001)  # ou qualquer porta livre
 ### Para melhor performance:
 
 1. **Instalar TensorFlow com GPU** (se disponível):
+
 ```bash
 pip install tensorflow-gpu
 ```
 
 2. **Usar ambiente conda** (alternativa ao venv):
+
 ```bash
 conda create -n reconhecimento python=3.9
 conda activate reconhecimento
@@ -292,6 +328,7 @@ pip install deepface
 ```
 
 3. **Otimizar OpenCV** (compilação personalizada):
+
 ```bash
 # Somente para usuários avançados
 # Compilar OpenCV com otimizações específicas do hardware

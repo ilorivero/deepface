@@ -62,19 +62,19 @@ O `requirements.txt` já escolhe automaticamente:
 ## ▶️ Execução
 
 ```bash
-python reconhecimento.py
+python main.py
 ```
 
 Abra no navegador:
 
-`http://127.0.0.1:5000`
+`http://localhost:5000`
 
 ## 🐞 Debug no VS Code
 
 O projeto já inclui configuração em `.vscode/launch.json`:
 
-- **Debug: reconhecimento.py**
-- **Debug: Flask (reconhecimento)**
+- **Debug: main.py**
+- **Debug: Flask (main)**
 
 Para usar:
 
@@ -139,12 +139,25 @@ pip install tf-keras
 
 ```text
 deepface/
-├── reconhecimento.py
+├── app/
+│   ├── __init__.py
+│   ├── routes.py
+│   └── services/
+│       ├── camera_service.py
+│       └── face_analyzer.py
+├── main.py
 ├── requirements.txt
 ├── README.md
 ├── INSTALL.md
 ├── QUICKSTART.md
+├── templates/
+│   └── index.html
 └── static/
+  ├── css/
+  │   └── style.css
+  ├── js/
+  │   └── app.js
+  └── icei.png
 ```
 
 ## 📄 Licença
