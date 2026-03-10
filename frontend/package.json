@@ -1,0 +1,11 @@
+{
+  "name": "deepface-frontend",
+  "private": true,
+  "scripts": {
+    "build:frontend": "tsc -p tsconfig.json",
+    "watch:frontend": "tsc -w -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

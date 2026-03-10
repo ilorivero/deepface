@@ -59,6 +59,28 @@ O `requirements.txt` já escolhe automaticamente:
 - `tensorflow` nas demais plataformas
 - `tf-keras` para compatibilidade com DeepFace + TensorFlow 2.16+
 
+## 🧩 Frontend com TypeScript
+
+O frontend foi migrado para TypeScript para facilitar manutenção e autocomplete.
+
+- Código-fonte: `frontend/ts/app.ts`
+- Arquivo gerado para o Flask servir: `frontend/public/js/app.js`
+
+Para compilar o frontend:
+
+```bash
+cd frontend
+npm install
+npm run build:frontend
+```
+
+Para compilar em modo watch durante desenvolvimento:
+
+```bash
+cd frontend
+npm run watch:frontend
+```
+
 ## ▶️ Execução
 
 ```bash
@@ -139,7 +161,7 @@ pip install tf-keras
 
 ```text
 deepface/
-├── app/
+├── deepface_app/
 │   ├── __init__.py
 │   ├── routes.py
 │   └── services/
@@ -150,14 +172,20 @@ deepface/
 ├── README.md
 ├── INSTALL.md
 ├── QUICKSTART.md
-├── templates/
-│   └── index.html
-└── static/
-  ├── css/
-  │   └── style.css
-  ├── js/
-  │   └── app.js
-  └── icei.png
+└── frontend/
+  ├── package.json
+  ├── tsconfig.json
+  ├── node_modules/
+  ├── templates/
+  │   └── index.html
+  ├── public/
+  │   ├── css/
+  │   │   └── style.css
+  │   ├── js/
+  │   │   └── app.js
+  │   └── icei.png
+  ├── ts/
+  │   └── app.ts
 ```
 
 ## 📄 Licença

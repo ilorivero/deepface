@@ -3,7 +3,7 @@ import os
 import platform
 import sys
 
-from app import create_app
+from deepface_app import create_app
 
 app = create_app()
 
