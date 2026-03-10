@@ -4,18 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Análise Facial em Tempo Real</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
     <header class="page-header">
-      <img
-        src="{{ url_for('static', filename='icei.png') }}"
-        alt="Logomarca ICEI"
-        class="logo header-logo"
-      />
+      <img src="/icei.png" alt="Logomarca ICEI" class="logo header-logo" />
       <h1>Análise Facial em Tempo Real</h1>
     </header>
 
@@ -61,25 +54,31 @@
       </div>
 
       <div class="info-container">
-        <img
-          src="{{ url_for('static', filename='icei.png') }}"
-          alt="Logomarca ICEI"
-          class="logo"
-        />
-
-        <div id="info">
-          <p id="age">Idade: ?</p>
-          <p id="gender">Gênero: ?</p>
-          <p id="emotion">Emoção: ?</p>
-          <p id="ethnicity">Etnia: ?</p>
-          <p id="server-ip">IP da máquina: detectando...</p>
-          <div id="remote-access">
-            <p id="remote-url">URL remota: detectando...</p>
-            <button id="copy-remote-url" type="button" disabled>
-              Copiar URL
-            </button>
-            <p id="remote-url-status"></p>
+        <div id="info" class="card react-card">
+          <div class="card-header">
+            <h2>Especificações da Foto</h2>
+            <p class="card-subtitle">Resultado da análise atual</p>
           </div>
+
+          <div class="spec-list">
+            <div class="spec-row">
+              <span class="spec-label">Idade</span>
+              <span id="age" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Gênero</span>
+              <span id="gender" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Humor</span>
+              <span id="emotion" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Etnia</span>
+              <span id="ethnicity" class="spec-value">?</span>
+            </div>
+          </div>
+
           <div id="emotion_details">
             <p>Top humores:</p>
             <ul id="emotion_details_list">
@@ -142,6 +141,6 @@
       </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="/js/app.js"></script>
   </body>
 </html>

@@ -10,6 +10,8 @@ function buildUI() {
     return {
         webcamView: getElementById("webcam-view"),
         cameraFeed: getElementById("camera-feed"),
+        uploadPlaceholder: getElementById("upload-placeholder"),
+        uploadPanel: getElementById("upload-panel"),
         webcamButton: getElementById("mode-webcam"),
         uploadButton: getElementById("mode-upload"),
         age: getElementById("age"),
@@ -55,15 +57,23 @@ async function copyTextToClipboard(text) {
 function setMode(mode, ui) {
     if (mode === "webcam") {
         ui.webcamView.classList.remove("hidden");
+        ui.uploadPanel.classList.add("hidden");
         ui.webcamButton.classList.add("active");
         ui.uploadButton.classList.remove("active");
+        ui.uploadPlaceholder.classList.add("hidden");
+        ui.cameraFeed.classList.remove("hidden");
         ui.cameraFeed.src = "/video_feed";
         ui.cameraFeed.alt = "Stream da webcam";
         return;
     }
     ui.webcamView.classList.remove("hidden");
+    ui.uploadPanel.classList.remove("hidden");
     ui.webcamButton.classList.remove("active");
     ui.uploadButton.classList.add("active");
+    ui.cameraFeed.src = "";
+    ui.cameraFeed.classList.add("hidden");
+    ui.uploadPlaceholder.classList.remove("hidden");
+    ui.uploadPlaceholder.innerText = "Esperando upload de arquivo";
 }
 function renderEmotionDetails(details, ui) {
     ui.emotionDetailsList.innerHTML = "";
@@ -80,14 +90,26 @@ function renderEmotionDetails(details, ui) {
     });
 }
 function renderAttributes(data, ui) {
-    ui.age.innerText = `Idade: ${data.age}`;
-    ui.gender.innerText = `Gênero: ${data.gender}`;
-    ui.emotion.innerText = `Emoção: ${data.emotion}`;
-    ui.ethnicity.innerText = `Etnia: ${data.ethnicity}`;
+    ui.age.innerText = data.age;
+    ui.gender.innerText = data.gender;
+    ui.emotion.innerText = data.emotion;
+    ui.ethnicity.innerText = data.ethnicity;
     renderEmotionDetails(data.emotion_details, ui);
+}
+function disabledAttributes() {
+    return {
+        age: "--",
+        gender: "--",
+        emotion: "--",
+        ethnicity: "--",
+        emotion_details: [],
+    };
 }
 function hasAttributes(payload) {
     return "attributes" in payload;
+}
+function hasCameraError(payload) {
+    return "error" in payload;
 }
 async function updateAttributes(ui) {
     try {
@@ -166,6 +188,8 @@ async function uploadFile(event, ui) {
         const data = (await response.json());
         if (data.preview) {
             setMode("upload", ui);
+            ui.uploadPlaceholder.classList.add("hidden");
+            ui.cameraFeed.classList.remove("hidden");
             ui.cameraFeed.src = `data:image/jpeg;base64,${data.preview}`;
             ui.cameraFeed.alt = "Preview da foto enviada";
         }

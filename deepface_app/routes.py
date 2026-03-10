@@ -30,6 +30,11 @@ def create_main_blueprint(face_analyzer, camera_service, state):
 
     @main_blueprint.route("/attributes")
     def attributes():
+        if not camera_service.is_camera_enabled():
+            disabled_state = _disabled_attributes()
+            state["latest_attributes"] = disabled_state
+            return jsonify(disabled_state)
+
         return jsonify(state["latest_attributes"])
 
     @main_blueprint.route("/server_info")

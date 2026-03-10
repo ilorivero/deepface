@@ -34,6 +34,8 @@ interface ServerInfoResponse {
 interface UIElements {
   webcamView: HTMLElement;
   cameraFeed: HTMLImageElement;
+  uploadPlaceholder: HTMLElement;
+  uploadPanel: HTMLElement;
   webcamButton: HTMLButtonElement;
   uploadButton: HTMLButtonElement;
   age: HTMLElement;
@@ -63,6 +65,8 @@ function buildUI(): UIElements {
   return {
     webcamView: getElementById<HTMLElement>("webcam-view"),
     cameraFeed: getElementById<HTMLImageElement>("camera-feed"),
+    uploadPlaceholder: getElementById<HTMLElement>("upload-placeholder"),
+    uploadPanel: getElementById<HTMLElement>("upload-panel"),
     webcamButton: getElementById<HTMLButtonElement>("mode-webcam"),
     uploadButton: getElementById<HTMLButtonElement>("mode-upload"),
     age: getElementById<HTMLElement>("age"),
@@ -109,16 +113,24 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
 function setMode(mode: Mode, ui: UIElements): void {
   if (mode === "webcam") {
     ui.webcamView.classList.remove("hidden");
+    ui.uploadPanel.classList.add("hidden");
     ui.webcamButton.classList.add("active");
     ui.uploadButton.classList.remove("active");
+    ui.uploadPlaceholder.classList.add("hidden");
+    ui.cameraFeed.classList.remove("hidden");
     ui.cameraFeed.src = "/video_feed";
     ui.cameraFeed.alt = "Stream da webcam";
     return;
   }
 
   ui.webcamView.classList.remove("hidden");
+  ui.uploadPanel.classList.remove("hidden");
   ui.webcamButton.classList.remove("active");
   ui.uploadButton.classList.add("active");
+  ui.cameraFeed.src = "";
+  ui.cameraFeed.classList.add("hidden");
+  ui.uploadPlaceholder.classList.remove("hidden");
+  ui.uploadPlaceholder.innerText = "Esperando upload de arquivo";
 }
 
 function renderEmotionDetails(details: EmotionDetail[], ui: UIElements): void {
@@ -139,17 +151,33 @@ function renderEmotionDetails(details: EmotionDetail[], ui: UIElements): void {
 }
 
 function renderAttributes(data: AttributesResponse, ui: UIElements): void {
-  ui.age.innerText = `Idade: ${data.age}`;
-  ui.gender.innerText = `Gênero: ${data.gender}`;
-  ui.emotion.innerText = `Emoção: ${data.emotion}`;
-  ui.ethnicity.innerText = `Etnia: ${data.ethnicity}`;
+  ui.age.innerText = data.age;
+  ui.gender.innerText = data.gender;
+  ui.emotion.innerText = data.emotion;
+  ui.ethnicity.innerText = data.ethnicity;
   renderEmotionDetails(data.emotion_details, ui);
+}
+
+function disabledAttributes(): AttributesResponse {
+  return {
+    age: "--",
+    gender: "--",
+    emotion: "--",
+    ethnicity: "--",
+    emotion_details: [],
+  };
 }
 
 function hasAttributes(
   payload: UploadResponse,
 ): payload is UploadSuccessResponse {
   return "attributes" in payload;
+}
+
+function hasCameraError(
+  payload: CameraStateResponse | CameraErrorResponse,
+): payload is CameraErrorResponse {
+  return "error" in payload;
 }
 
 async function updateAttributes(ui: UIElements): Promise<void> {
@@ -239,6 +267,8 @@ async function uploadFile(event: SubmitEvent, ui: UIElements): Promise<void> {
 
     if (data.preview) {
       setMode("upload", ui);
+      ui.uploadPlaceholder.classList.add("hidden");
+      ui.cameraFeed.classList.remove("hidden");
       ui.cameraFeed.src = `data:image/jpeg;base64,${data.preview}`;
       ui.cameraFeed.alt = "Preview da foto enviada";
     }
