@@ -87,9 +87,41 @@ npm run watch:frontend
 python main.py
 ```
 
-Abra no navegador:
+Por padrão, a aplicação sobe em modo LAN (`APP_HOST=0.0.0.0`) e imprime no log:
 
-`http://127.0.0.1:5000`
+- URL local (`http://127.0.0.1:8080`)
+- URLs da sua rede local (ex.: `http://192.168.0.15:8080`)
+
+Abra no navegador (mesmo computador):
+
+`http://127.0.0.1:8080`
+
+Para acessar de outro dispositivo na mesma rede (celular/notebook):
+
+`http://SEU_IP_DA_REDE:8080`
+
+### Variáveis de ambiente úteis
+
+- `APP_HOST` (default: `0.0.0.0`)
+- `APP_PORT` (default: `8080`)
+- `APP_DEBUG` (default: `false`)
+
+Exemplo (macOS/Linux):
+
+```bash
+APP_HOST=0.0.0.0 APP_PORT=8080 APP_DEBUG=false python main.py
+```
+
+Exemplo (Windows PowerShell):
+
+```powershell
+$env:APP_HOST="0.0.0.0"
+$env:APP_PORT="8080"
+$env:APP_DEBUG="false"
+python main.py
+```
+
+> Dica: se quiser isolar para acesso apenas local, use `APP_HOST=127.0.0.1`.
 
 ## 🐞 Debug no VS Code
 

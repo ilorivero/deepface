@@ -26,6 +26,11 @@ interface UploadErrorResponse {
 
 type UploadResponse = UploadSuccessResponse | UploadErrorResponse;
 
+interface ServerInfoResponse {
+  lan_ips: string[];
+  port: number;
+}
+
 interface UIElements {
   webcamView: HTMLElement;
   cameraFeed: HTMLImageElement;
@@ -35,6 +40,10 @@ interface UIElements {
   gender: HTMLElement;
   emotion: HTMLElement;
   ethnicity: HTMLElement;
+  serverIp: HTMLElement;
+  remoteUrl: HTMLElement;
+  remoteUrlStatus: HTMLElement;
+  copyRemoteUrlButton: HTMLButtonElement;
   emotionDetailsList: HTMLUListElement;
   status: HTMLElement;
   uploadForm: HTMLFormElement;
@@ -60,11 +69,41 @@ function buildUI(): UIElements {
     gender: getElementById<HTMLElement>("gender"),
     emotion: getElementById<HTMLElement>("emotion"),
     ethnicity: getElementById<HTMLElement>("ethnicity"),
+    serverIp: getElementById<HTMLElement>("server-ip"),
+    remoteUrl: getElementById<HTMLElement>("remote-url"),
+    remoteUrlStatus: getElementById<HTMLElement>("remote-url-status"),
+    copyRemoteUrlButton: getElementById<HTMLButtonElement>("copy-remote-url"),
     emotionDetailsList: getElementById<HTMLUListElement>("emotion_details_list"),
     status: getElementById<HTMLElement>("status"),
     uploadForm: getElementById<HTMLFormElement>("upload-form"),
     imageFile: getElementById<HTMLInputElement>("image-file"),
   };
+}
+
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  try {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const copied = document.execCommand("copy");
+    document.body.removeChild(textArea);
+    return copied;
+  } catch {
+    return false;
+  }
 }
 
 function setMode(mode: Mode, ui: UIElements): void {
@@ -127,6 +166,56 @@ async function updateAttributes(ui: UIElements): Promise<void> {
   }
 }
 
+async function updateServerInfo(ui: UIElements): Promise<void> {
+  let detectedRemoteUrl = "";
+
+  try {
+    const response = await fetch("/server_info");
+    if (!response.ok) {
+      throw new Error("Falha na resposta de informações do servidor.");
+    }
+
+    const data = (await response.json()) as ServerInfoResponse;
+
+    if (Array.isArray(data.lan_ips) && data.lan_ips.length > 0) {
+      const primaryIp = data.lan_ips[0];
+      ui.serverIp.innerText = `IP da máquina: ${primaryIp} (porta ${data.port})`;
+      detectedRemoteUrl = `http://${primaryIp}:${data.port}`;
+      ui.remoteUrl.innerText = `URL remota: ${detectedRemoteUrl}`;
+      ui.copyRemoteUrlButton.disabled = false;
+      ui.copyRemoteUrlButton.dataset.remoteUrl = detectedRemoteUrl;
+      return;
+    }
+
+    ui.serverIp.innerText = "IP da máquina: não detectado";
+    ui.remoteUrl.innerText = "URL remota: não detectada";
+    ui.copyRemoteUrlButton.disabled = true;
+    ui.copyRemoteUrlButton.dataset.remoteUrl = "";
+  } catch {
+    ui.serverIp.innerText = "IP da máquina: indisponível";
+    ui.remoteUrl.innerText = "URL remota: indisponível";
+    ui.copyRemoteUrlButton.disabled = true;
+    ui.copyRemoteUrlButton.dataset.remoteUrl = "";
+  } finally {
+    if (!detectedRemoteUrl) {
+      ui.remoteUrlStatus.innerText = "";
+    }
+  }
+}
+
+async function copyRemoteUrl(ui: UIElements): Promise<void> {
+  const remoteUrl = ui.copyRemoteUrlButton.dataset.remoteUrl || "";
+  if (!remoteUrl) {
+    ui.remoteUrlStatus.innerText = "URL remota indisponível para cópia.";
+    return;
+  }
+
+  const copied = await copyTextToClipboard(remoteUrl);
+  ui.remoteUrlStatus.innerText = copied
+    ? "URL copiada para a área de transferência."
+    : "Não foi possível copiar automaticamente.";
+}
+
 async function uploadFile(event: SubmitEvent, ui: UIElements): Promise<void> {
   event.preventDefault();
 
@@ -177,6 +266,7 @@ function initializeApp(): void {
 
   setMode("webcam", ui);
   void updateAttributes(ui);
+  void updateServerInfo(ui);
 
   setInterval(() => {
     void updateAttributes(ui);
@@ -184,6 +274,9 @@ function initializeApp(): void {
 
   ui.webcamButton.addEventListener("click", () => setMode("webcam", ui));
   ui.uploadButton.addEventListener("click", () => setMode("upload", ui));
+  ui.copyRemoteUrlButton.addEventListener("click", () => {
+    void copyRemoteUrl(ui);
+  });
 
   ui.uploadForm.addEventListener("submit", (event) => {
     void uploadFile(event as SubmitEvent, ui);

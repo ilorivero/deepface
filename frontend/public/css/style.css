@@ -100,6 +100,35 @@ h1 {
   font-weight: normal;
 }
 
+#remote-access {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+#remote-access p {
+  margin: 6px 0;
+}
+
+#copy-remote-url {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #333;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#copy-remote-url:disabled {
+  background: #888;
+  cursor: not-allowed;
+}
+
+#remote-url-status {
+  min-height: 16px;
+  color: #222;
+}
+
 .logo {
   width: 150px;
   margin-bottom: 10px;
