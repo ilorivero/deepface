@@ -1,4 +1,5 @@
 import platform
+import threading
 import time
 
 import cv2
@@ -7,8 +8,10 @@ import numpy as np
 
 class CameraService:
     def __init__(self):
-        self.cap = self.open_camera()
-        self.camera_available = self.cap is not None
+        self._lock = threading.Lock()
+        self.camera_enabled = False
+        self.cap = None
+        self.camera_available = False
 
     def open_camera(self):
         preferred_backends = []
@@ -35,9 +38,31 @@ class CameraService:
         return None
 
     def release_camera(self):
-        if self.cap is not None:
-            self.cap.release()
-            self.cap = None
+        with self._lock:
+            if self.cap is not None:
+                self.cap.release()
+                self.cap = None
+            self.camera_available = False
+
+    def is_camera_enabled(self):
+        with self._lock:
+            return self.camera_enabled
+
+    def start_camera(self):
+        with self._lock:
+            self.camera_enabled = True
+            if self.cap is None:
+                self.cap = self.open_camera()
+            self.camera_available = self.cap is not None
+            return self.camera_available
+
+    def stop_camera(self):
+        with self._lock:
+            self.camera_enabled = False
+            if self.cap is not None:
+                self.cap.release()
+                self.cap = None
+            self.camera_available = False
 
     def build_placeholder_frame(self, message):
         frame = np.zeros((480, 640, 3), dtype=np.uint8)
@@ -57,11 +82,30 @@ class CameraService:
 
     def generate_frames(self, process_frame_callback):
         while True:
-            if self.cap is None:
-                self.cap = self.open_camera()
-                self.camera_available = self.cap is not None
+            with self._lock:
+                if not self.camera_enabled:
+                    self.camera_available = False
+                    frame_bytes = self.build_placeholder_frame(
+                        "Webcam desligada. Clique em 'Ligar camera'."
+                    )
+                    should_wait = True
+                    cap = None
+                else:
+                    if self.cap is None:
+                        self.cap = self.open_camera()
+                    self.camera_available = self.cap is not None
+                    should_wait = False
+                    cap = self.cap
 
-            if self.cap is None:
+            if should_wait:
+                yield (
+                    b"--frame\r\n"
+                    b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+                )
+                time.sleep(0.4)
+                continue
+
+            if cap is None:
                 frame_bytes = self.build_placeholder_frame(
                     "Webcam indisponivel. Use o modo Upload de Arquivo."
                 )
@@ -72,11 +116,14 @@ class CameraService:
                 time.sleep(1)
                 continue
 
-            success, frame = self.cap.read()
+            success, frame = cap.read()
 
             if not success:
-                self.release_camera()
-                self.camera_available = False
+                with self._lock:
+                    if self.cap is cap:
+                        self.cap.release()
+                        self.cap = None
+                    self.camera_available = False
                 frame_bytes = self.build_placeholder_frame(
                     "Falha na webcam. Tentando reconectar..."
                 )
@@ -87,7 +134,8 @@ class CameraService:
                 time.sleep(0.5)
                 continue
 
-            self.camera_available = True
+            with self._lock:
+                self.camera_available = True
             processed_frame = process_frame_callback(frame)
             success, buffer = cv2.imencode(".jpg", processed_frame)
             if not success:

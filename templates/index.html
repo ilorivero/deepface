@@ -10,33 +10,20 @@
     />
   </head>
   <body>
-    <header class="page-header">
-      <img
-        src="{{ url_for('static', filename='icei.png') }}"
-        alt="Logomarca ICEI"
-        class="logo header-logo"
-      />
-      <h1>Análise Facial em Tempo Real</h1>
-    </header>
+    <h1>Análise Facial em Tempo Real</h1>
 
     <div class="toolbar">
       <div class="mode-buttons">
-        <button id="mode-webcam" type="button" class="active mode-card">
-          <span class="mode-title">Webcam</span>
-          <span class="mode-subtitle">Análise em tempo real</span>
-        </button>
-        <button id="mode-upload" type="button" class="mode-card">
-          <span class="mode-title">Upload de Arquivo</span>
-          <span class="mode-subtitle">Escolher imagem para analisar</span>
-        </button>
+        <button id="mode-webcam" type="button" class="active">Webcam</button>
+        <button id="mode-upload" type="button">Upload de Arquivo</button>
       </div>
       <button
         id="camera-toggle"
         type="button"
         class="camera-toggle"
-        data-enabled="false"
+        data-enabled="true"
       >
-        Ligar câmera
+        Desligar câmera
       </button>
     </div>
 
@@ -44,23 +31,17 @@
       <div class="media-column">
         <div id="webcam-view" class="video-container">
           <img id="camera-feed" src="/video_feed" alt="Stream da webcam" />
-          <div id="upload-placeholder" class="upload-placeholder hidden">
-            Esperando upload de arquivo
-          </div>
         </div>
-        <p id="camera-status" class="camera-status">Câmera desligada.</p>
-
-        <div id="upload-panel" class="card react-card hidden">
-          <h2>Upload de Arquivo</h2>
-          <form id="upload-form" enctype="multipart/form-data">
-            <input id="image-file" type="file" name="file" accept="image/*" />
-            <button type="submit">Enviar e analisar</button>
-          </form>
-          <p id="status"></p>
-        </div>
+        <p id="camera-status" class="camera-status">Câmera ligada.</p>
       </div>
 
       <div class="info-container">
+        <img
+          src="{{ url_for('static', filename='icei.png') }}"
+          alt="Logomarca ICEI"
+          class="logo"
+        />
+
         <div id="info" class="card react-card">
           <div class="card-header">
             <h2>Especificações da Foto</h2>
@@ -103,37 +84,19 @@
           <div class="spec-list">
             <div class="spec-row">
               <span class="spec-label">Servidor local</span>
-              <a
-                id="local-url"
-                class="link-value"
-                href="#"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
+              <a id="local-url" class="link-value" href="#" target="_blank" rel="noreferrer noopener">
                 carregando...
               </a>
             </div>
             <div class="spec-row">
               <span class="spec-label">Servidor na rede</span>
-              <a
-                id="remote-url"
-                class="link-value"
-                href="#"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
+              <a id="remote-url" class="link-value" href="#" target="_blank" rel="noreferrer noopener">
                 carregando...
               </a>
             </div>
             <div class="spec-row">
               <span class="spec-label">Feed da câmera</span>
-              <a
-                id="camera-feed-url"
-                class="link-value"
-                href="#"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
+              <a id="camera-feed-url" class="link-value" href="#" target="_blank" rel="noreferrer noopener">
                 carregando...
               </a>
             </div>
@@ -144,6 +107,15 @@
             Copiar link da rede
           </button>
           <p id="remote-url-status"></p>
+        </div>
+
+        <div class="card react-card">
+          <h2>Upload de Arquivo</h2>
+          <form id="upload-form" enctype="multipart/form-data">
+            <input id="image-file" type="file" name="file" accept="image/*" />
+            <button type="submit">Enviar e analisar</button>
+          </form>
+          <p id="status"></p>
         </div>
       </div>
     </div>

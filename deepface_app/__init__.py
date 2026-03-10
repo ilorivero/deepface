@@ -19,10 +19,10 @@ def _configure_logging():
 
 def _initial_attributes():
     return {
-        "age": "?",
-        "gender": "?",
-        "emotion": "?",
-        "ethnicity": "?",
+        "age": "--",
+        "gender": "--",
+        "emotion": "--",
+        "ethnicity": "--",
         "emotion_details": [],
     }
 
