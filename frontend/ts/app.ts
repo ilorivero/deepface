@@ -1,11 +1,16 @@
 type Mode = "webcam" | "upload";
 
+interface EmotionDetail {
+  emotion: string;
+  score: number;
+}
+
 interface AttributesResponse {
   age: string;
   gender: string;
   emotion: string;
   ethnicity: string;
-  emotion_details: string;
+  emotion_details: EmotionDetail[];
 }
 
 interface UploadSuccessResponse {
@@ -23,18 +28,17 @@ type UploadResponse = UploadSuccessResponse | UploadErrorResponse;
 
 interface UIElements {
   webcamView: HTMLElement;
-  uploadView: HTMLElement;
+  cameraFeed: HTMLImageElement;
   webcamButton: HTMLButtonElement;
   uploadButton: HTMLButtonElement;
   age: HTMLElement;
   gender: HTMLElement;
   emotion: HTMLElement;
   ethnicity: HTMLElement;
-  emotionDetails: HTMLElement;
+  emotionDetailsList: HTMLUListElement;
   status: HTMLElement;
   uploadForm: HTMLFormElement;
   imageFile: HTMLInputElement;
-  uploadPreview: HTMLImageElement;
 }
 
 function getElementById<T extends HTMLElement>(id: string): T {
@@ -49,34 +53,50 @@ function getElementById<T extends HTMLElement>(id: string): T {
 function buildUI(): UIElements {
   return {
     webcamView: getElementById<HTMLElement>("webcam-view"),
-    uploadView: getElementById<HTMLElement>("upload-view"),
+    cameraFeed: getElementById<HTMLImageElement>("camera-feed"),
     webcamButton: getElementById<HTMLButtonElement>("mode-webcam"),
     uploadButton: getElementById<HTMLButtonElement>("mode-upload"),
     age: getElementById<HTMLElement>("age"),
     gender: getElementById<HTMLElement>("gender"),
     emotion: getElementById<HTMLElement>("emotion"),
     ethnicity: getElementById<HTMLElement>("ethnicity"),
-    emotionDetails: getElementById<HTMLElement>("emotion_details"),
+    emotionDetailsList: getElementById<HTMLUListElement>("emotion_details_list"),
     status: getElementById<HTMLElement>("status"),
     uploadForm: getElementById<HTMLFormElement>("upload-form"),
     imageFile: getElementById<HTMLInputElement>("image-file"),
-    uploadPreview: getElementById<HTMLImageElement>("upload-preview"),
   };
 }
 
 function setMode(mode: Mode, ui: UIElements): void {
   if (mode === "webcam") {
     ui.webcamView.classList.remove("hidden");
-    ui.uploadView.classList.add("hidden");
     ui.webcamButton.classList.add("active");
     ui.uploadButton.classList.remove("active");
+    ui.cameraFeed.src = "/video_feed";
+    ui.cameraFeed.alt = "Stream da webcam";
     return;
   }
 
-  ui.webcamView.classList.add("hidden");
-  ui.uploadView.classList.remove("hidden");
+  ui.webcamView.classList.remove("hidden");
   ui.webcamButton.classList.remove("active");
   ui.uploadButton.classList.add("active");
+}
+
+function renderEmotionDetails(details: EmotionDetail[], ui: UIElements): void {
+  ui.emotionDetailsList.innerHTML = "";
+
+  if (!Array.isArray(details) || details.length === 0) {
+    const noDataItem = document.createElement("li");
+    noDataItem.innerText = "Sem dados";
+    ui.emotionDetailsList.appendChild(noDataItem);
+    return;
+  }
+
+  details.forEach((detail) => {
+    const listItem = document.createElement("li");
+    listItem.innerText = `${detail.emotion}: ${detail.score.toFixed(1)}%`;
+    ui.emotionDetailsList.appendChild(listItem);
+  });
 }
 
 function renderAttributes(data: AttributesResponse, ui: UIElements): void {
@@ -84,7 +104,7 @@ function renderAttributes(data: AttributesResponse, ui: UIElements): void {
   ui.gender.innerText = `Gênero: ${data.gender}`;
   ui.emotion.innerText = `Emoção: ${data.emotion}`;
   ui.ethnicity.innerText = `Etnia: ${data.ethnicity}`;
-  ui.emotionDetails.innerText = `Top emoções: ${data.emotion_details}`;
+  renderEmotionDetails(data.emotion_details, ui);
 }
 
 function hasAttributes(
@@ -129,11 +149,14 @@ async function uploadFile(event: SubmitEvent, ui: UIElements): Promise<void> {
     const data = (await response.json()) as UploadResponse;
 
     if (data.preview) {
-      ui.uploadPreview.src = `data:image/jpeg;base64,${data.preview}`;
+      setMode("upload", ui);
+      ui.cameraFeed.src = `data:image/jpeg;base64,${data.preview}`;
+      ui.cameraFeed.alt = "Preview da foto enviada";
     }
 
     if (!response.ok) {
-      ui.status.innerText = data.error || "Falha no upload.";
+      const errorMessage = "error" in data ? data.error : undefined;
+      ui.status.innerText = errorMessage || "Falha no upload.";
       return;
     }
 

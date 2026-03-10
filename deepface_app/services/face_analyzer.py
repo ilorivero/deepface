@@ -27,23 +27,27 @@ class FaceAnalyzer:
             "latino hispanic": "Latino/Hispânico",
         }
 
-    def format_top_emotions(self, emotion_scores):
+    def format_emotion_details(self, emotion_scores):
         if not emotion_scores:
-            return "Sem dados"
+            return []
 
-        top_3 = sorted(emotion_scores.items(), key=lambda item: item[1], reverse=True)[:3]
-        top_3_pt = [
-            f"{self.emotion_map.get(name, name)} ({score:.1f}%)"
-            for name, score in top_3
+        sorted_scores = sorted(
+            emotion_scores.items(), key=lambda item: item[1], reverse=True
+        )
+        return [
+            {
+                "emotion": self.emotion_map.get(name, name),
+                "score": round(float(score), 1),
+            }
+            for name, score in sorted_scores
         ]
-        return " | ".join(top_3_pt)
 
     def map_attributes(self, attributes):
         dominant_emotion_en = attributes["dominant_emotion"]
         dominant_emotion_pt = self.emotion_map.get(
             dominant_emotion_en, dominant_emotion_en
         )
-        emotion_details = self.format_top_emotions(attributes.get("emotion", {}))
+        emotion_details = self.format_emotion_details(attributes.get("emotion", {}))
         dominant_gender = attributes.get("dominant_gender", "")
 
         return {

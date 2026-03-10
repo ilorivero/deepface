@@ -23,7 +23,7 @@ def _initial_attributes():
         "gender": "?",
         "emotion": "?",
         "ethnicity": "?",
-        "emotion_details": "?",
+        "emotion_details": [],
     }
 
 
