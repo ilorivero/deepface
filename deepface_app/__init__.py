@@ -4,9 +4,9 @@ import os
 
 from flask import Flask
 
-from app.routes import create_main_blueprint
-from app.services.camera_service import CameraService
-from app.services.face_analyzer import FaceAnalyzer
+from deepface_app.routes import create_main_blueprint
+from deepface_app.services.camera_service import CameraService
+from deepface_app.services.face_analyzer import FaceAnalyzer
 
 
 def _configure_logging():
@@ -32,8 +32,9 @@ def create_app():
 
     app = Flask(
         __name__,
-        template_folder="../templates",
-        static_folder="../static",
+        template_folder="../frontend/templates",
+        static_folder="../frontend/public",
+        static_url_path="/static",
     )
 
     camera_service = CameraService()
