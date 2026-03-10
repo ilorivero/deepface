@@ -11,10 +11,15 @@
 deepface>=0.0.79                # Framework de análise facial com modelos pré-treinados
 opencv-python>=4.5.0            # Computer vision e processamento de imagem
 flask>=2.0.0                    # Framework web para interface HTTP
-numpy>=1.19.0                   # Computação numérica e manipulação de arrays
+numpy>=1.23,<2.0                # Computação numérica (faixa compatível com TensorFlow)
 
 # Deep Learning Framework
-tensorflow>=2.4.0               # Framework de deep learning (backend do DeepFace)
+# macOS Apple Silicon (arm64)
+tensorflow-macos>=2.16.0; platform_system == "Darwin" and platform_machine == "arm64"
+# Demais plataformas
+tensorflow>=2.16.0; platform_system != "Darwin" or platform_machine != "arm64"
+# Compatibilidade exigida pelo DeepFace com TensorFlow 2.16+
+tf-keras>=2.16.0
 
 # Bibliotecas de Suporte
 Pillow>=8.0.0                   # Processamento de imagens PIL

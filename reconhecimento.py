@@ -36,14 +36,29 @@
 
 # 1. IMPORTAÇÃO DAS BIBLIOTECAS NECESSÁRIAS
 # ==============================================================================
-import cv2                                          # OpenCV - para captura e processamento de vídeo
-import numpy as np                                  # NumPy - para manipulação de arrays
-from deepface import DeepFace                       # DeepFace - para análise facial avançada
-from flask import Flask, Response, render_template_string, jsonify  # Flask - para criar a interface web
+import atexit
+import base64
+import logging
+import os
+import platform
+import sys
+import time
+
+import cv2
+import numpy as np
+from deepface import DeepFace
+from flask import Flask, Response, jsonify, render_template_string, request
 
 # 2. INICIALIZAÇÃO DA APLICAÇÃO FLASK
 # ==============================================================================
 app = Flask(__name__)  # Cria a instância da aplicação web
+
+# Configuração simples de logs
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL, logging.INFO),
+    format="%(asctime)s | %(levelname)s | %(message)s",
+)
 
 # 3. TEMPLATE HTML DA INTERFACE WEB
 # ==============================================================================
@@ -55,22 +70,53 @@ HTML_TEMPLATE = """
 <head>
     <title>Análise Facial em Tempo Real</title>
     <style>
-        /* Estilos CSS para formatação da página */
         body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
         h1 { color: #333; }
 
         .container {
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             gap: 20px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
-        .video-container {
+        .video-container, .upload-container {
             border: 3px solid #333;
             padding: 5px;
             background-color: white;
+            min-height: 370px;
+        }
+
+        .video-container img, .upload-container img {
+            width: 640px;
+            max-width: 90vw;
+            height: auto;
+            background: #111;
+        }
+
+        .mode-buttons {
+            margin-bottom: 10px;
+        }
+
+        .mode-buttons button {
+            border: none;
+            border-radius: 6px;
+            padding: 10px 14px;
+            cursor: pointer;
+            margin: 0 5px;
+            background: #d5d5d5;
+            font-weight: bold;
+        }
+
+        .mode-buttons button.active {
+            background: #333;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
         }
 
         .info-container {
@@ -99,41 +145,145 @@ HTML_TEMPLATE = """
             margin-bottom: 10px;
         }
 
+        #upload-form {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 250px;
+        }
+
+        #upload-form button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            background: #333;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #status {
+            min-height: 20px;
+            font-size: 14px;
+            color: #222;
+        }
+
     </style>
     <script>
-        // JavaScript para atualizar os atributos faciais a cada segundo
+        let currentMode = 'webcam';
+
+        function setMode(mode) {
+            currentMode = mode;
+            const webcamView = document.getElementById('webcam-view');
+            const uploadView = document.getElementById('upload-view');
+            const webcamButton = document.getElementById('mode-webcam');
+            const uploadButton = document.getElementById('mode-upload');
+
+            if (mode === 'webcam') {
+                webcamView.classList.remove('hidden');
+                uploadView.classList.add('hidden');
+                webcamButton.classList.add('active');
+                uploadButton.classList.remove('active');
+            } else {
+                webcamView.classList.add('hidden');
+                uploadView.classList.remove('hidden');
+                webcamButton.classList.remove('active');
+                uploadButton.classList.add('active');
+            }
+        }
+
         function updateAttributes() {
-            fetch('/attributes')  // Faz requisição para obter os dados analisados
+            fetch('/attributes')
                 .then(response => response.json())
                 .then(data => {
-                    // Atualiza os elementos HTML com os dados recebidos
                     document.getElementById("age").innerText = "Idade: " + data.age;
                     document.getElementById("gender").innerText = "Gênero: " + data.gender;
                     document.getElementById("emotion").innerText = "Emoção: " + data.emotion;
                     document.getElementById("ethnicity").innerText = "Etnia: " + data.ethnicity;
                 });
         }
-        setInterval(updateAttributes, 1000);  // Executa a função a cada 1000ms (1 segundo)
+
+        function uploadFile(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('image-file');
+            const status = document.getElementById('status');
+            const preview = document.getElementById('upload-preview');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                status.innerText = 'Selecione um arquivo de imagem.';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            status.innerText = 'Analisando arquivo...';
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) {
+                    status.innerText = data.error || 'Falha no upload.';
+                    return;
+                }
+
+                status.innerText = data.message;
+                document.getElementById("age").innerText = "Idade: " + data.attributes.age;
+                document.getElementById("gender").innerText = "Gênero: " + data.attributes.gender;
+                document.getElementById("emotion").innerText = "Emoção: " + data.attributes.emotion;
+                document.getElementById("ethnicity").innerText = "Etnia: " + data.attributes.ethnicity;
+
+                if (data.preview) {
+                    preview.src = 'data:image/jpeg;base64,' + data.preview;
+                }
+            })
+            .catch(() => {
+                status.innerText = 'Erro ao enviar arquivo.';
+            });
+        }
+
+        window.onload = function() {
+            setMode('webcam');
+            updateAttributes();
+            setInterval(updateAttributes, 1000);
+            document.getElementById('upload-form').addEventListener('submit', uploadFile);
+        };
     </script>
 </head>
 <body>
     <h1>Análise Facial em Tempo Real</h1>
+
+    <div class="mode-buttons">
+        <button id="mode-webcam" type="button" class="active" onclick="setMode('webcam')">Webcam</button>
+        <button id="mode-upload" type="button" onclick="setMode('upload')">Upload de Arquivo</button>
+    </div>
     
     <div class="container">
-        <div class="video-container">
-            <!-- Exibe o stream de vídeo da webcam -->
-            <img src="/video_feed">
+        <div id="webcam-view" class="video-container">
+            <img src="/video_feed" alt="Stream da webcam">
         </div>
+
+        <div id="upload-view" class="upload-container hidden">
+            <img id="upload-preview" alt="Preview do arquivo analisado">
+        </div>
+
         <div class="info-container">
-            <!-- Logo da instituição -->
             <img src="{{ url_for('static', filename='icei.png') }}" alt="Logomarca ICEI" class="logo">
-            <!-- Painel com informações analisadas -->
             <div id="info">
                 <p id="age">Idade: ?</p>
                 <p id="gender">Gênero: ?</p>
                 <p id="emotion">Emoção: ?</p>
                 <p id="ethnicity">Etnia: ?</p>
             </div>
+
+            <form id="upload-form" enctype="multipart/form-data">
+                <input id="image-file" type="file" name="file" accept="image/*">
+                <button type="submit">Enviar e analisar</button>
+                <p id="status"></p>
+            </form>
         </div>
     </div>
 </body>
@@ -142,7 +292,29 @@ HTML_TEMPLATE = """
 
 # 4. INICIALIZAÇÃO DOS COMPONENTES DE VISÃO COMPUTACIONAL
 # ==============================================================================
-cap = cv2.VideoCapture(0)  # Inicializa a captura de vídeo da webcam (índice 0 = câmera padrão)
+def open_camera():
+    preferred_backends = []
+    current_system = platform.system().lower()
+
+    if current_system == "darwin":
+        preferred_backends = [cv2.CAP_AVFOUNDATION]
+    elif current_system == "windows":
+        preferred_backends = [cv2.CAP_DSHOW, cv2.CAP_MSMF]
+    else:
+        preferred_backends = [cv2.CAP_V4L2]
+
+    for camera_index in (0, 1, 2):
+        for backend in preferred_backends + [None]:
+            cam = cv2.VideoCapture(camera_index) if backend is None else cv2.VideoCapture(camera_index, backend)
+            if cam.isOpened():
+                return cam
+            cam.release()
+
+    return None
+
+
+cap = open_camera()
+camera_available = cap is not None
 
 # Carrega o classificador Haar Cascade para detecção de rostos
 # Este é um classificador pré-treinado que detecta rostos frontais em imagens
@@ -153,6 +325,55 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 # Esta variável mantém os dados mais recentes da análise facial
 # para serem exibidos na interface web
 latest_attributes = {"age": "?", "gender": "?", "emotion": "?", "ethnicity": "?"}
+
+emotion_map = {
+    "angry": "Zangado",
+    "disgust": "Nojo",
+    "fear": "Medo",
+    "happy": "Feliz",
+    "neutral": "Neutro",
+    "sad": "Triste",
+    "surprise": "Surpresa"
+}
+
+ethnicity_map = {
+    "white": "Branco",
+    "black": "Negro",
+    "asian": "Asiático",
+    "indian": "Indiano",
+    "middle eastern": "Oriente Médio",
+    "latino hispanic": "Latino/Hispânico"
+}
+
+
+def release_camera():
+    global cap
+    if cap is not None:
+        cap.release()
+        cap = None
+
+
+atexit.register(release_camera)
+
+
+def log_startup(host, port):
+    separator = "=" * 60
+    logging.info(separator)
+    logging.info("Sistema de Reconhecimento Facial iniciado")
+    logging.info("SO: %s", platform.platform())
+    logging.info("Python: %s", sys.version.split()[0])
+    logging.info("Diretório: %s", os.getcwd())
+    logging.info("Webcam disponível: %s", "sim" if camera_available else "não")
+    logging.info("Rodando em: http://%s:%s", host, port)
+    logging.info("Pressione Ctrl+C para encerrar")
+    logging.info(separator)
+
+
+def build_placeholder_frame(message):
+    frame = np.zeros((480, 640, 3), dtype=np.uint8)
+    cv2.putText(frame, message, (20, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+    _, buffer = cv2.imencode('.jpg', frame)
+    return buffer.tobytes()
 
 # 6. FUNÇÃO PRINCIPAL DE ANÁLISE FACIAL
 # ==============================================================================
@@ -176,54 +397,15 @@ def analyze_face(frame):
     global latest_attributes
     
     try:
-        # ETAPA 1: DETECÇÃO DE ROSTOS
-        # Converte o frame para escala de cinza (necessário para o Haar Cascade)
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        
-        # Detecta rostos no frame
-        # Parâmetros: (imagem, fator_escala, min_vizinhos)
-        # - fator_escala=1.3: reduz a imagem em 30% a cada iteração
-        # - min_vizinhos=5: número mínimo de detecções vizinhas para confirmar um rosto
+
         faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
-        
-        # ETAPA 2: ANÁLISE DE CADA ROSTO DETECTADO
+
         for (x, y, w, h) in faces:
-            # Extrai a região do rosto do frame original
             face_region = frame[y:y+h, x:x+w]
-            
-            # ETAPA 3: ANÁLISE COM DEEPFACE
-            # Aplica o algoritmo DeepFace para analisar múltiplos atributos
-            # - age: estimativa da idade
-            # - gender: classificação de gênero
-            # - emotion: detecção de emoção facial
-            # - race: estimativa de etnia
-            # - enforce_detection=False: permite análise mesmo com baixa confiança na detecção
             result = DeepFace.analyze(face_region, actions=['age', 'gender', 'emotion', 'race'], enforce_detection=False)
-            attributes = result[0]  # Pega o primeiro resultado (caso múltiplos rostos)
+            attributes = result[0]
 
-            # ETAPA 4: MAPEAMENTO PARA PORTUGUÊS
-            # Converte os resultados em inglês para português brasileiro
-            emotion_map = {
-                "angry": "Zangado",
-                "disgust": "Nojo", 
-                "fear": "Medo",
-                "happy": "Feliz",
-                "neutral": "Neutro",
-                "sad": "Triste",
-                "surprise": "Surpresa"
-            }
-
-            ethnicity_map = {
-                "white": "Branco",
-                "black": "Negro",
-                "asian": "Asiático", 
-                "indian": "Indiano",
-                "middle eastern": "Oriente Médio",
-                "latino hispanic": "Latino/Hispânico"
-            }
-
-            # ETAPA 5: ATUALIZAÇÃO DOS RESULTADOS
-            # Organiza os dados analisados e atualiza a variável global
             latest_attributes = {
                 "age": f"{attributes['age']} anos",
                 "gender": "Masculino" if attributes['dominant_gender'] == "Man" else "Feminino",
@@ -231,16 +413,12 @@ def analyze_face(frame):
                 "ethnicity": ethnicity_map.get(attributes['dominant_race'], attributes['dominant_race'])
             }
 
-            # ETAPA 6: DESENHO DO RETÂNGULO DE DETECÇÃO
-            # Desenha um retângulo verde ao redor do rosto detectado
-            # Parâmetros: (imagem, ponto_inicial, ponto_final, cor_BGR, espessura)
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         return frame
         
     except Exception as e:
-        # Em caso de erro (ex: nenhum rosto detectado), retorna o frame original
-        print(f"Erro na análise facial: {e}")
+        logging.error("Erro na análise facial: %s", e)
         return frame
 
 # 7. FUNÇÃO GERADORA DE FRAMES PARA STREAMING
@@ -257,28 +435,39 @@ def generate_frames():
     Yields:
         bytes: Frame codificado em JPEG formatado para streaming HTTP
     """
+    global cap
+    global camera_available
+
     while True:
-        # Captura um frame da webcam
-        success, frame = cap.read()
-        
-        if not success:
-            print("Erro ao capturar frame da webcam")
-            break
-        else:
-            # Aplica a análise facial no frame capturado
-            processed_frame = analyze_face(frame)
-            
-            # Codifica o frame processado em formato JPEG
-            # Retorna: (sucesso, buffer_com_imagem_codificada)
-            _, buffer = cv2.imencode('.jpg', processed_frame)
-            
-            # Converte o buffer NumPy para bytes
-            frame_bytes = buffer.tobytes()
-            
-            # Formata os dados para streaming HTTP multipart
-            # Este formato permite que o browser atualize a imagem continuamente
+        if cap is None:
+            cap = open_camera()
+            camera_available = cap is not None
+
+        if cap is None:
+            frame_bytes = build_placeholder_frame("Webcam indisponivel. Use o modo Upload de Arquivo.")
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            time.sleep(1)
+            continue
+
+        success, frame = cap.read()
+
+        if not success:
+            release_camera()
+            camera_available = False
+            frame_bytes = build_placeholder_frame("Falha na webcam. Tentando reconectar...")
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            time.sleep(0.5)
+            continue
+
+        camera_available = True
+        processed_frame = analyze_face(frame)
+        _, buffer = cv2.imencode('.jpg', processed_frame)
+        frame_bytes = buffer.tobytes()
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
 # 8. ROTAS DA APLICAÇÃO WEB (FLASK ENDPOINTS)
 # ==============================================================================
@@ -292,7 +481,7 @@ def index():
     Returns:
         str: Template HTML renderizado
     """
-    return render_template_string(HTML_TEMPLATE)
+    return render_template_string(HTML_TEMPLATE, camera_available=camera_available)
 
 @app.route('/video_feed')
 def video_feed():
@@ -322,6 +511,35 @@ def attributes():
     """
     return jsonify(latest_attributes)
 
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    global latest_attributes
+
+    file_obj = request.files.get('file')
+    if file_obj is None or file_obj.filename == '':
+        return jsonify({"error": "Nenhum arquivo enviado."}), 400
+
+    file_bytes = np.frombuffer(file_obj.read(), np.uint8)
+    image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+    if image is None:
+        return jsonify({"error": "Arquivo inválido. Envie uma imagem."}), 400
+
+    processed_image = analyze_face(image)
+    success, buffer = cv2.imencode('.jpg', processed_image)
+
+    if not success:
+        return jsonify({"error": "Falha ao processar imagem."}), 500
+
+    preview_base64 = base64.b64encode(buffer.tobytes()).decode('utf-8')
+
+    return jsonify({
+        "message": "Arquivo analisado com sucesso!",
+        "attributes": latest_attributes,
+        "preview": preview_base64
+    })
+
 # 9. EXECUÇÃO PRINCIPAL DO PROGRAMA
 # ==============================================================================
 if __name__ == '__main__':
@@ -337,15 +555,16 @@ if __name__ == '__main__':
     - debug=True: Habilita o modo de depuração (reinicialização automática
       quando o código é modificado e exibição detalhada de erros)
     """
-    print("=== SISTEMA DE RECONHECIMENTO FACIAL ===")
-    print("Iniciando servidor...")
-    print("Acesse: http://127.0.0.1:5000")
-    print("Pressione Ctrl+C para encerrar")
-    print("=" * 40)
+    host = os.getenv("APP_HOST", "127.0.0.1")
+    port = int(os.getenv("APP_PORT", "5000"))
+    log_startup(host, port)
     
     try:
-        app.run(debug=True)
+        app.run(host=host, port=port, debug=True)
     except KeyboardInterrupt:
-        print("\nEncerrando aplicação...")
-        cap.release()  # Libera a webcam
-        print("Webcam liberada. Aplicação finalizada.")
+        logging.info("Encerrando aplicação...")
+        release_camera()
+        logging.info("Webcam liberada. Aplicação finalizada.")
+    except Exception:
+        logging.exception("Falha crítica ao iniciar/executar a aplicação")
+        release_camera()
