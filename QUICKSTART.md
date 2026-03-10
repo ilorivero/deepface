@@ -17,7 +17,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Execute o programa
-python reconhecimento.py
+python main.py
 
 # 5. Acesse no navegador
 # http://127.0.0.1:5000
@@ -38,7 +38,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Execute o programa
-python reconhecimento.py
+python main.py
 
 # 5. Acesse no navegador
 # http://127.0.0.1:5000
@@ -47,6 +47,7 @@ python reconhecimento.py
 ## 🔄 Comandos Úteis
 
 ### Ativação do Ambiente Virtual
+
 ```bash
 # Windows
 venv\Scripts\activate
@@ -56,16 +57,19 @@ source venv/bin/activate
 ```
 
 ### Desativação do Ambiente Virtual
+
 ```bash
 deactivate
 ```
 
 ### Atualizar Dependências
+
 ```bash
 pip install --upgrade -r requirements.txt
 ```
 
 ### Limpar Cache Python
+
 ```bash
 # Windows
 rmdir /s __pycache__
@@ -75,6 +79,7 @@ find . -type d -name "__pycache__" -exec rm -rf {} +
 ```
 
 ### Verificar Versões
+
 ```bash
 python --version
 pip list
@@ -83,23 +88,27 @@ pip list
 ## 🐛 Resolução Rápida de Problemas
 
 ### Webcam não funciona
+
 ```bash
 # Teste a webcam
 python -c "import cv2; cap=cv2.VideoCapture(0); print('OK' if cap.isOpened() else 'ERRO'); cap.release()"
 ```
 
 ### Erro de importação
+
 ```bash
 pip install --force-reinstall opencv-python deepface flask tensorflow
 ```
 
 ### Porta ocupada
+
 ```bash
 # Use porta diferente (altere no código)
 # app.run(debug=True, port=5001)
 ```
 
 ### Limpeza completa
+
 ```bash
 # Remover ambiente virtual e recomeçar
 rm -rf venv  # macOS/Linux

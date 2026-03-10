@@ -1,0 +1,73 @@
+import base64
+
+import cv2
+import numpy as np
+from flask import Blueprint, Response, jsonify, render_template, request
+
+
+def create_main_blueprint(face_analyzer, camera_service, state):
+    main_blueprint = Blueprint("main", __name__)
+
+    @main_blueprint.route("/")
+    def index():
+        return render_template("index.html")
+
+    @main_blueprint.route("/video_feed")
+    def video_feed():
+        def process_frame(frame):
+            processed_frame, attributes = face_analyzer.analyze_face(frame)
+            if attributes is not None:
+                state["latest_attributes"] = attributes
+            return processed_frame
+
+        return Response(
+            camera_service.generate_frames(process_frame),
+            mimetype="multipart/x-mixed-replace; boundary=frame",
+        )
+
+    @main_blueprint.route("/attributes")
+    def attributes():
+        return jsonify(state["latest_attributes"])
+
+    @main_blueprint.route("/upload", methods=["POST"])
+    def upload():
+        file_obj = request.files.get("file")
+        if file_obj is None or file_obj.filename == "":
+            return jsonify({"error": "Nenhum arquivo enviado."}), 400
+
+        file_bytes = np.frombuffer(file_obj.read(), np.uint8)
+        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+        if image is None:
+            return jsonify({"error": "Arquivo inválido. Envie uma imagem."}), 400
+
+        processed_image, attributes = face_analyzer.analyze_face(image)
+        success, buffer = cv2.imencode(".jpg", processed_image)
+
+        if not success:
+            return jsonify({"error": "Falha ao processar imagem."}), 500
+
+        preview_base64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
+
+        if attributes is None:
+            return (
+                jsonify(
+                    {
+                        "error": "Nenhum rosto detectado na imagem.",
+                        "attributes": state["latest_attributes"],
+                        "preview": preview_base64,
+                    }
+                ),
+                422,
+            )
+
+        state["latest_attributes"] = attributes
+        return jsonify(
+            {
+                "message": "Arquivo analisado com sucesso!",
+                "attributes": state["latest_attributes"],
+                "preview": preview_base64,
+            }
+        )
+
+    return main_blueprint

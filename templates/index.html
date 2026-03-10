@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análise Facial em Tempo Real</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Análise Facial em Tempo Real</h1>
+
+    <div class="mode-buttons">
+      <button
+        id="mode-webcam"
+        type="button"
+        class="active"
+        onclick="setMode('webcam')"
+      >
+        Webcam
+      </button>
+      <button id="mode-upload" type="button" onclick="setMode('upload')">
+        Upload de Arquivo
+      </button>
+    </div>
+
+    <div class="container">
+      <div id="webcam-view" class="video-container">
+        <img src="/video_feed" alt="Stream da webcam" />
+      </div>
+
+      <div id="upload-view" class="upload-container hidden">
+        <img id="upload-preview" alt="Preview do arquivo analisado" />
+      </div>
+
+      <div class="info-container">
+        <img
+          src="{{ url_for('static', filename='icei.png') }}"
+          alt="Logomarca ICEI"
+          class="logo"
+        />
+
+        <div id="info">
+          <p id="age">Idade: ?</p>
+          <p id="gender">Gênero: ?</p>
+          <p id="emotion">Emoção: ?</p>
+          <p id="ethnicity">Etnia: ?</p>
+          <p id="emotion_details">Top emoções: ?</p>
+        </div>
+
+        <form id="upload-form" enctype="multipart/form-data">
+          <input id="image-file" type="file" name="file" accept="image/*" />
+          <button type="submit">Enviar e analisar</button>
+          <p id="status"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>
