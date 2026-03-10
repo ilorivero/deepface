@@ -1,47 +1,9 @@
-import logging
-import os
-import platform
-import sys
-
 from deepface_app import create_app
+from deepface_app.server import read_server_settings, run_server
 
 app = create_app()
 
 
-def log_startup(host, port):
-    camera_service = app.config["CAMERA_SERVICE"]
-    separator = "=" * 60
-    logging.info(separator)
-    logging.info("Sistema de Reconhecimento Facial iniciado")
-    logging.info("SO: %s", platform.platform())
-    logging.info("Python: %s", sys.version.split()[0])
-    logging.info("Diretório: %s", os.getcwd())
-    logging.info(
-        "Webcam disponível: %s",
-        "sim" if camera_service.camera_available else "não",
-    )
-    logging.info("Rodando em: http://%s:%s", host, port)
-    logging.info("Pressione Ctrl+C para encerrar")
-    logging.info(separator)
-
-
 if __name__ == "__main__":
-    raw_host = os.getenv("APP_HOST", "localhost").strip()
-    host = "127.0.0.1" if raw_host.lower() == "localhost" else raw_host
-    port = int(os.getenv("APP_PORT", "5000").strip())
-
-    if raw_host.lower() == "localhost":
-        logging.warning(
-            "APP_HOST=localhost detectado. Usando 127.0.0.1 para evitar conflito local."
-        )
-    log_startup(host, port)
-
-    try:
-        app.run(host=host, port=port, debug=True)
-    except KeyboardInterrupt:
-        logging.info("Encerrando aplicação...")
-        app.config["CAMERA_SERVICE"].release_camera()
-        logging.info("Webcam liberada. Aplicação finalizada.")
-    except Exception:
-        logging.exception("Falha crítica ao iniciar/executar a aplicação")
-        app.config["CAMERA_SERVICE"].release_camera()
+    settings = read_server_settings()
+    run_server(app, settings)

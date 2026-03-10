@@ -4,6 +4,9 @@ import cv2
 import numpy as np
 from flask import Blueprint, Response, jsonify, render_template, request
 
+from deepface_app.constants import DEFAULT_APP_PORT
+from deepface_app.server.network import discover_lan_ips
+
 
 def create_main_blueprint(face_analyzer, camera_service, state):
     main_blueprint = Blueprint("main", __name__)
@@ -28,6 +31,20 @@ def create_main_blueprint(face_analyzer, camera_service, state):
     @main_blueprint.route("/attributes")
     def attributes():
         return jsonify(state["latest_attributes"])
+
+    @main_blueprint.route("/server_info")
+    def server_info():
+        lan_ips = discover_lan_ips()
+        host_with_port = request.host or ""
+        _, _, port = host_with_port.rpartition(":")
+        resolved_port = port if port.isdigit() else str(DEFAULT_APP_PORT)
+
+        return jsonify(
+            {
+                "lan_ips": lan_ips,
+                "port": int(resolved_port),
+            }
+        )
 
     @main_blueprint.route("/upload", methods=["POST"])
     def upload():

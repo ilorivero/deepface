@@ -301,11 +301,11 @@ sudo usermod -a -G video $USER
 # Reiniciar sessão
 ```
 
-### Problema 6: Porta 5000 ocupada
+### Problema 6: Porta 8080 ocupada
 
-```python
-# Alterar porta no arquivo main.py
-app.run(debug=True, port=5001)  # ou qualquer porta livre
+```bash
+# Definir outra porta sem alterar código
+APP_PORT=8081 python main.py  # ou qualquer porta livre
 ```
 
 ## 🚀 Otimizações Opcionais
