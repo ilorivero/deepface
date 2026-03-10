@@ -140,6 +140,12 @@ HTML_TEMPLATE = """
             font-weight: bold;
         }
 
+        #emotion_details {
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+
         .logo {
             width: 150px;
             margin-bottom: 10px;
@@ -201,6 +207,7 @@ HTML_TEMPLATE = """
                     document.getElementById("gender").innerText = "Gênero: " + data.gender;
                     document.getElementById("emotion").innerText = "Emoção: " + data.emotion;
                     document.getElementById("ethnicity").innerText = "Etnia: " + data.ethnicity;
+                    document.getElementById("emotion_details").innerText = "Top emoções: " + data.emotion_details;
                 });
         }
 
@@ -235,6 +242,7 @@ HTML_TEMPLATE = """
                 document.getElementById("gender").innerText = "Gênero: " + data.attributes.gender;
                 document.getElementById("emotion").innerText = "Emoção: " + data.attributes.emotion;
                 document.getElementById("ethnicity").innerText = "Etnia: " + data.attributes.ethnicity;
+                document.getElementById("emotion_details").innerText = "Top emoções: " + data.attributes.emotion_details;
 
                 if (data.preview) {
                     preview.src = 'data:image/jpeg;base64,' + data.preview;
@@ -277,6 +285,7 @@ HTML_TEMPLATE = """
                 <p id="gender">Gênero: ?</p>
                 <p id="emotion">Emoção: ?</p>
                 <p id="ethnicity">Etnia: ?</p>
+                <p id="emotion_details">Top emoções: ?</p>
             </div>
 
             <form id="upload-form" enctype="multipart/form-data">
@@ -324,7 +333,7 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 # ==============================================================================
 # Esta variável mantém os dados mais recentes da análise facial
 # para serem exibidos na interface web
-latest_attributes = {"age": "?", "gender": "?", "emotion": "?", "ethnicity": "?"}
+latest_attributes = {"age": "?", "gender": "?", "emotion": "?", "ethnicity": "?", "emotion_details": "?"}
 
 emotion_map = {
     "angry": "Zangado",
@@ -375,6 +384,18 @@ def build_placeholder_frame(message):
     _, buffer = cv2.imencode('.jpg', frame)
     return buffer.tobytes()
 
+
+def format_top_emotions(emotion_scores):
+    if not emotion_scores:
+        return "Sem dados"
+
+    top_3 = sorted(emotion_scores.items(), key=lambda item: item[1], reverse=True)[:3]
+    top_3_pt = [
+        f"{emotion_map.get(name, name)} ({score:.1f}%)"
+        for name, score in top_3
+    ]
+    return " | ".join(top_3_pt)
+
 # 6. FUNÇÃO PRINCIPAL DE ANÁLISE FACIAL
 # ==============================================================================
 def analyze_face(frame):
@@ -405,15 +426,28 @@ def analyze_face(frame):
             face_region = frame[y:y+h, x:x+w]
             result = DeepFace.analyze(face_region, actions=['age', 'gender', 'emotion', 'race'], enforce_detection=False)
             attributes = result[0]
+            dominant_emotion_en = attributes['dominant_emotion']
+            dominant_emotion_pt = emotion_map.get(dominant_emotion_en, dominant_emotion_en)
+            emotion_details = format_top_emotions(attributes.get('emotion', {}))
 
             latest_attributes = {
                 "age": f"{attributes['age']} anos",
                 "gender": "Masculino" if attributes['dominant_gender'] == "Man" else "Feminino",
-                "emotion": emotion_map.get(attributes['dominant_emotion'], attributes['dominant_emotion']),
-                "ethnicity": ethnicity_map.get(attributes['dominant_race'], attributes['dominant_race'])
+                "emotion": dominant_emotion_pt,
+                "ethnicity": ethnicity_map.get(attributes['dominant_race'], attributes['dominant_race']),
+                "emotion_details": emotion_details
             }
 
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.putText(
+                frame,
+                f"Emocao: {dominant_emotion_pt}",
+                (x, max(y - 10, 20)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 0),
+                2,
+            )
 
         return frame
         
