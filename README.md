@@ -89,7 +89,7 @@ python main.py
 
 Abra no navegador:
 
-`http://localhost:5000`
+`http://127.0.0.1:5000`
 
 ## 🐞 Debug no VS Code
 
@@ -126,7 +126,11 @@ Exemplo:
   "gender": "Masculino",
   "emotion": "Feliz",
   "ethnicity": "Branco",
-  "emotion_details": "Feliz (82.3%) | Neutro (10.4%) | Surpresa (4.1%)"
+  "emotion_details": [
+    { "emotion": "Feliz", "score": 82.3 },
+    { "emotion": "Neutro", "score": 10.4 },
+    { "emotion": "Surpresa", "score": 4.1 }
+  ]
 }
 ```
 

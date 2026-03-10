@@ -26,8 +26,14 @@ def log_startup(host, port):
 
 
 if __name__ == "__main__":
-    host = os.getenv("APP_HOST", "localhost")
-    port = int(os.getenv("APP_PORT", "5000"))
+    raw_host = os.getenv("APP_HOST", "localhost").strip()
+    host = "127.0.0.1" if raw_host.lower() == "localhost" else raw_host
+    port = int(os.getenv("APP_PORT", "5000").strip())
+
+    if raw_host.lower() == "localhost":
+        logging.warning(
+            "APP_HOST=localhost detectado. Usando 127.0.0.1 para evitar conflito local."
+        )
     log_startup(host, port)
 
     try:
