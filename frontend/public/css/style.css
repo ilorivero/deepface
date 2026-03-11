@@ -265,7 +265,6 @@ a {
 #emotion_details_list li {
   margin: 4px 0;
   font-weight: bold;
-<<<<<<< HEAD
 }
 
 .server-ip {
@@ -278,106 +277,6 @@ a {
   min-height: 18px;
   margin-top: 8px;
   font-size: 14px;
-}
-
-.logo {
-  display: block;
-}
-
-#upload-panel {
-  width: min(100%, 520px);
-  padding: 12px;
-}
-
-#upload-form {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 8px;
-}
-
-#image-file {
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 8px;
-  background: #fff;
-}
-
-#status {
-  min-height: 18px;
-  font-size: 13px;
-  margin: 6px 0 0;
-}
-
-@media (max-width: 860px) {
-  .page-header {
-    flex-direction: column;
-    gap: 8px;
-    min-height: auto;
-  }
-
-  .header-logo {
-    position: static;
-    transform: none;
-    width: 96px;
-  }
-
-  .mode-buttons {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .mode-card,
-  .camera-toggle {
-    min-width: 160px;
-  }
-
-  #upload-form {
-    grid-template-columns: 1fr;
-  }
-=======
-}
-
-.server-ip {
-  margin: 12px 0 8px;
-  font-size: 13px;
-  color: #4b5563;
-}
-
-#remote-url-status {
-  min-height: 18px;
-  margin-top: 8px;
-  font-size: 14px;
-}
-
-#remote-access {
-  margin-top: 12px;
-  font-size: 14px;
-}
-
-#remote-access p {
-  margin: 6px 0;
-}
-
-#copy-remote-url {
-  border: none;
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: #333;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#copy-remote-url:disabled {
-  background: #888;
-  cursor: not-allowed;
-}
-
-#remote-url-status {
-  min-height: 16px;
-  color: #222;
->>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 }
 
 .logo {
