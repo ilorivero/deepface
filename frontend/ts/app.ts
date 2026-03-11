@@ -31,6 +31,19 @@ interface ServerInfoResponse {
   port: number;
 }
 
+<<<<<<< HEAD
+interface CameraStateResponse {
+  enabled: boolean;
+  available: boolean;
+  message?: string;
+}
+
+interface CameraErrorResponse {
+  error?: string;
+}
+
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 interface UIElements {
   webcamView: HTMLElement;
   cameraFeed: HTMLImageElement;
@@ -42,10 +55,21 @@ interface UIElements {
   gender: HTMLElement;
   emotion: HTMLElement;
   ethnicity: HTMLElement;
+<<<<<<< HEAD
+  localUrl: HTMLAnchorElement;
+  serverIp: HTMLElement;
+  remoteUrl: HTMLAnchorElement;
+  cameraFeedUrl: HTMLAnchorElement;
+  remoteUrlStatus: HTMLElement;
+  copyRemoteUrlButton: HTMLButtonElement;
+  cameraToggleButton: HTMLButtonElement;
+  cameraStatus: HTMLElement;
+=======
   serverIp: HTMLElement;
   remoteUrl: HTMLElement;
   remoteUrlStatus: HTMLElement;
   copyRemoteUrlButton: HTMLButtonElement;
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
   emotionDetailsList: HTMLUListElement;
   status: HTMLElement;
   uploadForm: HTMLFormElement;
@@ -73,10 +97,21 @@ function buildUI(): UIElements {
     gender: getElementById<HTMLElement>("gender"),
     emotion: getElementById<HTMLElement>("emotion"),
     ethnicity: getElementById<HTMLElement>("ethnicity"),
+<<<<<<< HEAD
+    localUrl: getElementById<HTMLAnchorElement>("local-url"),
+    serverIp: getElementById<HTMLElement>("server-ip"),
+    remoteUrl: getElementById<HTMLAnchorElement>("remote-url"),
+    cameraFeedUrl: getElementById<HTMLAnchorElement>("camera-feed-url"),
+    remoteUrlStatus: getElementById<HTMLElement>("remote-url-status"),
+    copyRemoteUrlButton: getElementById<HTMLButtonElement>("copy-remote-url"),
+    cameraToggleButton: getElementById<HTMLButtonElement>("camera-toggle"),
+    cameraStatus: getElementById<HTMLElement>("camera-status"),
+=======
     serverIp: getElementById<HTMLElement>("server-ip"),
     remoteUrl: getElementById<HTMLElement>("remote-url"),
     remoteUrlStatus: getElementById<HTMLElement>("remote-url-status"),
     copyRemoteUrlButton: getElementById<HTMLButtonElement>("copy-remote-url"),
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
     emotionDetailsList: getElementById<HTMLUListElement>("emotion_details_list"),
     status: getElementById<HTMLElement>("status"),
     uploadForm: getElementById<HTMLFormElement>("upload-form"),
@@ -204,24 +239,55 @@ async function updateServerInfo(ui: UIElements): Promise<void> {
     }
 
     const data = (await response.json()) as ServerInfoResponse;
+<<<<<<< HEAD
+    const localUrl = `http://127.0.0.1:${data.port}`;
+
+    ui.localUrl.innerText = localUrl;
+    ui.localUrl.href = localUrl;
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 
     if (Array.isArray(data.lan_ips) && data.lan_ips.length > 0) {
       const primaryIp = data.lan_ips[0];
       ui.serverIp.innerText = `IP da máquina: ${primaryIp} (porta ${data.port})`;
       detectedRemoteUrl = `http://${primaryIp}:${data.port}`;
+<<<<<<< HEAD
+      ui.remoteUrl.innerText = detectedRemoteUrl;
+      ui.remoteUrl.href = detectedRemoteUrl;
+      ui.cameraFeedUrl.innerText = `${detectedRemoteUrl}/video_feed`;
+      ui.cameraFeedUrl.href = `${detectedRemoteUrl}/video_feed`;
+=======
       ui.remoteUrl.innerText = `URL remota: ${detectedRemoteUrl}`;
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
       ui.copyRemoteUrlButton.disabled = false;
       ui.copyRemoteUrlButton.dataset.remoteUrl = detectedRemoteUrl;
       return;
     }
 
     ui.serverIp.innerText = "IP da máquina: não detectado";
+<<<<<<< HEAD
+    ui.remoteUrl.innerText = "não detectado";
+    ui.remoteUrl.href = "#";
+    ui.cameraFeedUrl.innerText = `${localUrl}/video_feed`;
+    ui.cameraFeedUrl.href = `${localUrl}/video_feed`;
+    ui.copyRemoteUrlButton.disabled = true;
+    ui.copyRemoteUrlButton.dataset.remoteUrl = "";
+  } catch {
+    ui.localUrl.innerText = "indisponível";
+    ui.localUrl.href = "#";
+    ui.serverIp.innerText = "IP da máquina: indisponível";
+    ui.remoteUrl.innerText = "indisponível";
+    ui.remoteUrl.href = "#";
+    ui.cameraFeedUrl.innerText = "indisponível";
+    ui.cameraFeedUrl.href = "#";
+=======
     ui.remoteUrl.innerText = "URL remota: não detectada";
     ui.copyRemoteUrlButton.disabled = true;
     ui.copyRemoteUrlButton.dataset.remoteUrl = "";
   } catch {
     ui.serverIp.innerText = "IP da máquina: indisponível";
     ui.remoteUrl.innerText = "URL remota: indisponível";
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
     ui.copyRemoteUrlButton.disabled = true;
     ui.copyRemoteUrlButton.dataset.remoteUrl = "";
   } finally {
@@ -244,6 +310,82 @@ async function copyRemoteUrl(ui: UIElements): Promise<void> {
     : "Não foi possível copiar automaticamente.";
 }
 
+<<<<<<< HEAD
+function applyCameraState(state: CameraStateResponse, ui: UIElements): void {
+  ui.cameraToggleButton.dataset.enabled = state.enabled ? "true" : "false";
+  ui.cameraToggleButton.innerText = state.enabled
+    ? "Desligar câmera"
+    : "Ligar câmera";
+  ui.cameraToggleButton.classList.toggle("active", state.enabled);
+
+  if (state.enabled) {
+    ui.cameraStatus.innerText = state.available
+      ? "Câmera ligada e pronta."
+      : "Câmera ligada, aguardando dispositivo.";
+    return;
+  }
+
+  ui.cameraStatus.innerText = "Câmera desligada.";
+  renderAttributes(disabledAttributes(), ui);
+}
+
+async function refreshCameraStatus(ui: UIElements): Promise<void> {
+  try {
+    const response = await fetch("/camera_status");
+    if (!response.ok) {
+      throw new Error("Falha ao consultar status da câmera.");
+    }
+
+    const data = (await response.json()) as CameraStateResponse;
+    applyCameraState(data, ui);
+  } catch {
+    ui.cameraStatus.innerText = "Status da câmera indisponível.";
+  }
+}
+
+async function toggleCamera(ui: UIElements): Promise<void> {
+  const currentlyEnabled = ui.cameraToggleButton.dataset.enabled === "true";
+  const targetEnabled = !currentlyEnabled;
+
+  ui.cameraToggleButton.disabled = true;
+  ui.cameraToggleButton.innerText = "Atualizando...";
+
+  try {
+    const response = await fetch("/camera/control", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ enabled: targetEnabled }),
+    });
+
+    const data = (await response.json()) as CameraStateResponse | CameraErrorResponse;
+
+    if (!response.ok) {
+      ui.status.innerText = hasCameraError(data)
+        ? data.error || "Não foi possível alterar a câmera."
+        : "Não foi possível alterar a câmera.";
+      await refreshCameraStatus(ui);
+      return;
+    }
+
+    applyCameraState(data as CameraStateResponse, ui);
+    ui.status.innerText =
+      (data as CameraStateResponse).message || "Estado da câmera atualizado.";
+
+    if ((data as CameraStateResponse).enabled) {
+      setMode("webcam", ui);
+    }
+  } catch {
+    ui.status.innerText = "Erro ao alternar o estado da câmera.";
+    await refreshCameraStatus(ui);
+  } finally {
+    ui.cameraToggleButton.disabled = false;
+  }
+}
+
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 async function uploadFile(event: SubmitEvent, ui: UIElements): Promise<void> {
   event.preventDefault();
 
@@ -297,6 +439,10 @@ function initializeApp(): void {
   setMode("webcam", ui);
   void updateAttributes(ui);
   void updateServerInfo(ui);
+<<<<<<< HEAD
+  void refreshCameraStatus(ui);
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 
   setInterval(() => {
     void updateAttributes(ui);
@@ -307,6 +453,12 @@ function initializeApp(): void {
   ui.copyRemoteUrlButton.addEventListener("click", () => {
     void copyRemoteUrl(ui);
   });
+<<<<<<< HEAD
+  ui.cameraToggleButton.addEventListener("click", () => {
+    void toggleCamera(ui);
+  });
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 
   ui.uploadForm.addEventListener("submit", (event) => {
     void uploadFile(event as SubmitEvent, ui);

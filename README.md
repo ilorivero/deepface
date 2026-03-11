@@ -87,8 +87,44 @@ npm run watch:frontend
 python main.py
 ```
 
+<<<<<<< HEAD
+## 🐳 Docker (front + back)
+
+Esta dockerização sobe dois serviços:
+
+- `backend`: Flask + DeepFace
+- `frontend`: Nginx servindo o frontend e fazendo proxy para o backend
+
+Guia completo de dockerização (arquitetura, healthcheck, cache de modelos, troubleshooting): `DOCKER.md`.
+
+### Subir tudo
+
+```bash
+docker compose up --build
+```
+
+### URLs
+
+- Frontend: `http://127.0.0.1:8080`
+- Backend direto: `http://127.0.0.1:8081`
+
+### Parar
+
+```bash
+docker compose down
+```
+
+### Observações
+
+- O endpoint de vídeo (`/video_feed`) é proxied pelo frontend para o backend.
+- O acesso à webcam em container pode exigir configuração extra de dispositivo, dependendo do sistema operacional.
+
 Por padrão, a aplicação sobe em modo LAN (`APP_HOST=0.0.0.0`) e imprime no log:
 
+=======
+Por padrão, a aplicação sobe em modo LAN (`APP_HOST=0.0.0.0`) e imprime no log:
+
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 - URL local (`http://127.0.0.1:8080`)
 - URLs da sua rede local (ex.: `http://192.168.0.15:8080`)
 

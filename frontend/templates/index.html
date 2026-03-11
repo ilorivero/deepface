@@ -61,12 +61,33 @@
       </div>
 
       <div class="info-container">
-        <img
-          src="{{ url_for('static', filename='icei.png') }}"
-          alt="Logomarca ICEI"
-          class="logo"
-        />
+        <div id="info" class="card react-card">
+          <div class="card-header">
+            <h2>Especificações da Foto</h2>
+            <p class="card-subtitle">Resultado da análise atual</p>
+          </div>
 
+          <div class="spec-list">
+            <div class="spec-row">
+              <span class="spec-label">Idade</span>
+              <span id="age" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Gênero</span>
+              <span id="gender" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Humor</span>
+              <span id="emotion" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Etnia</span>
+              <span id="ethnicity" class="spec-value">?</span>
+            </div>
+          </div>
+
+<<<<<<< HEAD
+=======
         <div id="info">
           <p id="age">Idade: ?</p>
           <p id="gender">Gênero: ?</p>
@@ -80,6 +101,7 @@
             </button>
             <p id="remote-url-status"></p>
           </div>
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
           <div id="emotion_details">
             <p>Top humores:</p>
             <ul id="emotion_details_list">
