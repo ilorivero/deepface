@@ -18,6 +18,7 @@ function buildUI() {
         gender: getElementById("gender"),
         emotion: getElementById("emotion"),
         ethnicity: getElementById("ethnicity"),
+<<<<<<< HEAD
         localUrl: getElementById("local-url"),
         serverIp: getElementById("server-ip"),
         remoteUrl: getElementById("remote-url"),
@@ -26,6 +27,12 @@ function buildUI() {
         copyRemoteUrlButton: getElementById("copy-remote-url"),
         cameraToggleButton: getElementById("camera-toggle"),
         cameraStatus: getElementById("camera-status"),
+=======
+        serverIp: getElementById("server-ip"),
+        remoteUrl: getElementById("remote-url"),
+        remoteUrlStatus: getElementById("remote-url-status"),
+        copyRemoteUrlButton: getElementById("copy-remote-url"),
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
         emotionDetailsList: getElementById("emotion_details_list"),
         status: getElementById("status"),
         uploadForm: getElementById("upload-form"),
@@ -136,30 +143,42 @@ async function updateServerInfo(ui) {
             throw new Error("Falha na resposta de informações do servidor.");
         }
         const data = (await response.json());
+<<<<<<< HEAD
         const localUrl = `http://127.0.0.1:${data.port}`;
         ui.localUrl.innerText = localUrl;
         ui.localUrl.href = localUrl;
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
         if (Array.isArray(data.lan_ips) && data.lan_ips.length > 0) {
             const primaryIp = data.lan_ips[0];
             ui.serverIp.innerText = `IP da máquina: ${primaryIp} (porta ${data.port})`;
             detectedRemoteUrl = `http://${primaryIp}:${data.port}`;
+<<<<<<< HEAD
             ui.remoteUrl.innerText = detectedRemoteUrl;
             ui.remoteUrl.href = detectedRemoteUrl;
             ui.cameraFeedUrl.innerText = `${detectedRemoteUrl}/video_feed`;
             ui.cameraFeedUrl.href = `${detectedRemoteUrl}/video_feed`;
+=======
+            ui.remoteUrl.innerText = `URL remota: ${detectedRemoteUrl}`;
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
             ui.copyRemoteUrlButton.disabled = false;
             ui.copyRemoteUrlButton.dataset.remoteUrl = detectedRemoteUrl;
             return;
         }
         ui.serverIp.innerText = "IP da máquina: não detectado";
+<<<<<<< HEAD
         ui.remoteUrl.innerText = "não detectado";
         ui.remoteUrl.href = "#";
         ui.cameraFeedUrl.innerText = `${localUrl}/video_feed`;
         ui.cameraFeedUrl.href = `${localUrl}/video_feed`;
+=======
+        ui.remoteUrl.innerText = "URL remota: não detectada";
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
         ui.copyRemoteUrlButton.disabled = true;
         ui.copyRemoteUrlButton.dataset.remoteUrl = "";
     }
     catch {
+<<<<<<< HEAD
         ui.localUrl.innerText = "indisponível";
         ui.localUrl.href = "#";
         ui.serverIp.innerText = "IP da máquina: indisponível";
@@ -167,6 +186,10 @@ async function updateServerInfo(ui) {
         ui.remoteUrl.href = "#";
         ui.cameraFeedUrl.innerText = "indisponível";
         ui.cameraFeedUrl.href = "#";
+=======
+        ui.serverIp.innerText = "IP da máquina: indisponível";
+        ui.remoteUrl.innerText = "URL remota: indisponível";
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
         ui.copyRemoteUrlButton.disabled = true;
         ui.copyRemoteUrlButton.dataset.remoteUrl = "";
     }
@@ -187,6 +210,7 @@ async function copyRemoteUrl(ui) {
         ? "URL copiada para a área de transferência."
         : "Não foi possível copiar automaticamente.";
 }
+<<<<<<< HEAD
 function applyCameraState(state, ui) {
     ui.cameraToggleButton.dataset.enabled = state.enabled ? "true" : "false";
     ui.cameraToggleButton.innerText = state.enabled
@@ -251,6 +275,8 @@ async function toggleCamera(ui) {
         ui.cameraToggleButton.disabled = false;
     }
 }
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 async function uploadFile(event, ui) {
     var _a;
     event.preventDefault();
@@ -296,7 +322,10 @@ function initializeApp() {
     setMode("webcam", ui);
     void updateAttributes(ui);
     void updateServerInfo(ui);
+<<<<<<< HEAD
     void refreshCameraStatus(ui);
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
     setInterval(() => {
         void updateAttributes(ui);
     }, 1000);
@@ -305,9 +334,12 @@ function initializeApp() {
     ui.copyRemoteUrlButton.addEventListener("click", () => {
         void copyRemoteUrl(ui);
     });
+<<<<<<< HEAD
     ui.cameraToggleButton.addEventListener("click", () => {
         void toggleCamera(ui);
     });
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
     ui.uploadForm.addEventListener("submit", (event) => {
         void uploadFile(event, ui);
     });

@@ -87,6 +87,7 @@ npm run watch:frontend
 python main.py
 ```
 
+<<<<<<< HEAD
 ## 🐳 Docker (front + back)
 
 Esta dockerização sobe dois serviços:
@@ -120,6 +121,10 @@ docker compose down
 
 Por padrão, a aplicação sobe em modo LAN (`APP_HOST=0.0.0.0`) e imprime no log:
 
+=======
+Por padrão, a aplicação sobe em modo LAN (`APP_HOST=0.0.0.0`) e imprime no log:
+
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 - URL local (`http://127.0.0.1:8080`)
 - URLs da sua rede local (ex.: `http://192.168.0.15:8080`)
 

@@ -7,6 +7,7 @@ from flask import Blueprint, Response, jsonify, render_template, request
 from deepface_app.constants import DEFAULT_APP_PORT
 from deepface_app.server.network import discover_lan_ips
 
+<<<<<<< HEAD
 
 def _disabled_attributes():
     return {
@@ -17,6 +18,8 @@ def _disabled_attributes():
         "emotion_details": [],
     }
 
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
 
 def create_main_blueprint(face_analyzer, camera_service, state):
     main_blueprint = Blueprint("main", __name__)
@@ -47,6 +50,7 @@ def create_main_blueprint(face_analyzer, camera_service, state):
 
         return jsonify(state["latest_attributes"])
 
+<<<<<<< HEAD
     @main_blueprint.route("/camera_status")
     def camera_status():
         return jsonify(
@@ -85,6 +89,8 @@ def create_main_blueprint(face_analyzer, camera_service, state):
             }
         )
 
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
     @main_blueprint.route("/server_info")
     def server_info():
         lan_ips = discover_lan_ips()
@@ -99,10 +105,13 @@ def create_main_blueprint(face_analyzer, camera_service, state):
             }
         )
 
+<<<<<<< HEAD
     @main_blueprint.route("/health")
     def health():
         return jsonify({"status": "ok"})
 
+=======
+>>>>>>> b382f62099cb01f1277335dbca7aa7ec9356e7f8
     @main_blueprint.route("/upload", methods=["POST"])
     def upload():
         file_obj = request.files.get("file")
