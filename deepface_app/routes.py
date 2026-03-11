@@ -99,6 +99,10 @@ def create_main_blueprint(face_analyzer, camera_service, state):
             }
         )
 
+    @main_blueprint.route("/health")
+    def health():
+        return jsonify({"status": "ok"})
+
     @main_blueprint.route("/upload", methods=["POST"])
     def upload():
         file_obj = request.files.get("file")
