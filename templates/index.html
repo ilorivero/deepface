@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análise Facial em Tempo Real</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Análise Facial em Tempo Real</h1>
+
+    <div class="toolbar">
+      <div class="mode-buttons">
+        <button id="mode-webcam" type="button" class="active">Webcam</button>
+        <button id="mode-upload" type="button">Upload de Arquivo</button>
+      </div>
+      <button
+        id="camera-toggle"
+        type="button"
+        class="camera-toggle"
+        data-enabled="true"
+      >
+        Desligar câmera
+      </button>
+    </div>
+
+    <div class="container">
+      <div class="media-column">
+        <div id="webcam-view" class="video-container">
+          <img id="camera-feed" src="/video_feed" alt="Stream da webcam" />
+        </div>
+        <p id="camera-status" class="camera-status">Câmera ligada.</p>
+      </div>
+
+      <div class="info-container">
+        <img
+          src="{{ url_for('static', filename='icei.png') }}"
+          alt="Logomarca ICEI"
+          class="logo"
+        />
+
+        <div id="info" class="card react-card">
+          <div class="card-header">
+            <h2>Especificações da Foto</h2>
+            <p class="card-subtitle">Resultado da análise atual</p>
+          </div>
+
+          <div class="spec-list">
+            <div class="spec-row">
+              <span class="spec-label">Idade</span>
+              <span id="age" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Gênero</span>
+              <span id="gender" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Humor</span>
+              <span id="emotion" class="spec-value">?</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Etnia</span>
+              <span id="ethnicity" class="spec-value">?</span>
+            </div>
+          </div>
+
+          <div id="emotion_details">
+            <p>Top humores:</p>
+            <ul id="emotion_details_list">
+              <li>Sem dados</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="remote-access" class="card react-card">
+          <div class="card-header">
+            <h2>Links do Servidor</h2>
+            <p class="card-subtitle">Acesso local e pela rede</p>
+          </div>
+
+          <div class="spec-list">
+            <div class="spec-row">
+              <span class="spec-label">Servidor local</span>
+              <a id="local-url" class="link-value" href="#" target="_blank" rel="noreferrer noopener">
+                carregando...
+              </a>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Servidor na rede</span>
+              <a id="remote-url" class="link-value" href="#" target="_blank" rel="noreferrer noopener">
+                carregando...
+              </a>
+            </div>
+            <div class="spec-row">
+              <span class="spec-label">Feed da câmera</span>
+              <a id="camera-feed-url" class="link-value" href="#" target="_blank" rel="noreferrer noopener">
+                carregando...
+              </a>
+            </div>
+          </div>
+
+          <p id="server-ip" class="server-ip">IP da máquina: carregando...</p>
+          <button id="copy-remote-url" type="button" disabled>
+            Copiar link da rede
+          </button>
+          <p id="remote-url-status"></p>
+        </div>
+
+        <div class="card react-card">
+          <h2>Upload de Arquivo</h2>
+          <form id="upload-form" enctype="multipart/form-data">
+            <input id="image-file" type="file" name="file" accept="image/*" />
+            <button type="submit">Enviar e analisar</button>
+          </form>
+          <p id="status"></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

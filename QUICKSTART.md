@@ -17,10 +17,16 @@ venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Execute o programa
-python reconhecimento.py
+$env:APP_HOST="0.0.0.0"
+$env:APP_PORT="8080"
+$env:APP_DEBUG="false"
+python main.py
 
-# 5. Acesse no navegador
-# http://127.0.0.1:5000
+# 5. Acesse no navegador (mesmo PC)
+# http://127.0.0.1:8080
+
+# 6. Acesse de outro dispositivo na mesma rede
+# http://SEU_IP_DA_REDE:8080
 ```
 
 ## ⚡ Execução Rápida (macOS/Linux)
@@ -38,15 +44,25 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Execute o programa
-python reconhecimento.py
+APP_HOST=0.0.0.0 APP_PORT=8080 APP_DEBUG=false python main.py
 
-# 5. Acesse no navegador
-# http://127.0.0.1:5000
+# ou defina as variáveis separadamente:
+# export APP_HOST=0.0.0.0
+# export APP_PORT=8080
+# export APP_DEBUG=false
+python main.py
+
+# 5. Acesse no navegador (mesmo computador)
+# http://127.0.0.1:8080
+
+# 6. Acesse de outro dispositivo na mesma rede
+# http://SEU_IP_DA_REDE:8080
 ```
 
 ## 🔄 Comandos Úteis
 
 ### Ativação do Ambiente Virtual
+
 ```bash
 # Windows
 venv\Scripts\activate
@@ -56,16 +72,19 @@ source venv/bin/activate
 ```
 
 ### Desativação do Ambiente Virtual
+
 ```bash
 deactivate
 ```
 
 ### Atualizar Dependências
+
 ```bash
 pip install --upgrade -r requirements.txt
 ```
 
 ### Limpar Cache Python
+
 ```bash
 # Windows
 rmdir /s __pycache__
@@ -75,6 +94,7 @@ find . -type d -name "__pycache__" -exec rm -rf {} +
 ```
 
 ### Verificar Versões
+
 ```bash
 python --version
 pip list
@@ -83,23 +103,36 @@ pip list
 ## 🐛 Resolução Rápida de Problemas
 
 ### Webcam não funciona
+
 ```bash
 # Teste a webcam
 python -c "import cv2; cap=cv2.VideoCapture(0); print('OK' if cap.isOpened() else 'ERRO'); cap.release()"
 ```
 
 ### Erro de importação
+
 ```bash
 pip install --force-reinstall opencv-python deepface flask tensorflow
 ```
 
 ### Porta ocupada
+
 ```bash
-# Use porta diferente (altere no código)
-# app.run(debug=True, port=5001)
+# Use porta diferente sem alterar código
+# macOS/Linux: APP_PORT=8081 python main.py
+# PowerShell: $env:APP_PORT="8081"; python main.py
+```
+
+### Dispositivo remoto não acessa
+
+```bash
+# 1) Confirme que o servidor subiu com APP_HOST=0.0.0.0
+# 2) Verifique se host e dispositivo estão na mesma rede
+# 3) Libere a porta 8080 no firewall do sistema
 ```
 
 ### Limpeza completa
+
 ```bash
 # Remover ambiente virtual e recomeçar
 rm -rf venv  # macOS/Linux
@@ -112,9 +145,10 @@ python -m venv venv
 
 ## 📱 URLs Importantes
 
-- **Aplicação local**: http://127.0.0.1:5000
-- **Stream de vídeo**: http://127.0.0.1:5000/video_feed
-- **API de atributos**: http://127.0.0.1:5000/attributes
+- **Aplicação local**: http://127.0.0.1:8080
+- **Aplicação na rede local**: http://SEU_IP_DA_REDE:8080
+- **Stream de vídeo**: http://SEU_IP_DA_REDE:8080/video_feed
+- **API de atributos**: http://SEU_IP_DA_REDE:8080/attributes
 
 ## 🎯 Primeiro Uso
 
